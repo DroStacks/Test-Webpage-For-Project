@@ -44,6 +44,61 @@ nav {
     color: #0f4c5c;
 }
 
+.hero {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+}
+
+.hero-content {
+    max-width: 650px;
+}
+
+.hero h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #102a43;
+}
+
+.hero p {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #486581;
+    margin-bottom: 32px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.primary-button,
+.secondary-button {
+    display: inline-block;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.primary-button {
+    background-color: #0f4c5c;
+    color: white;
+}
+
+.secondary-button {
+    border: 2px solid #0f4c5c;
+    color: #0f4c5c;
+    background-color: white;
+}
+
+.primary-button:hover {
+    background-color: #0b3b47;
+}
+
+.secondary-button:hover {
+    background-color: #e8f1f4;
+}
 main {
     max-width: 1200px;
     margin: 0 auto;
