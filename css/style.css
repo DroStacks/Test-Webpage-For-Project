@@ -149,6 +149,8 @@ main {
     line-height: 1.6;
 }
 
+/* WHY CHOOSE HEALTHBRIDGE SECTION */
+
 .why-us {
     padding: 70px 0;
 }
@@ -156,17 +158,37 @@ main {
 .why-us-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
+    gap: 24px;
 }
 
 .why-us-item {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #d9e2ec;
     text-align: center;
-    padding: 20px;
+}
+
+.why-us-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #0f4c5c;
+    color: #ffffff;
+
+    border-radius: 50%;
+    font-size: 30px;
 }
 
 .why-us-item h3 {
     color: #0f4c5c;
     font-size: 21px;
+    margin-top: 0;
     margin-bottom: 12px;
 }
 
