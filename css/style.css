@@ -148,3 +148,29 @@ main {
     color: #486581;
     line-height: 1.6;
 }
+
+.why-us {
+    padding: 70px 0;
+}
+
+.why-us-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.why-us-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.why-us-item h3 {
+    color: #0f4c5c;
+    font-size: 21px;
+    margin-bottom: 12px;
+}
+
+.why-us-item p {
+    color: #486581;
+    line-height: 1.6;
+}
