@@ -104,3 +104,47 @@ main {
     margin: 0 auto;
     padding: 60px 24px;
 }
+
+.services-section {
+    padding: 70px 0;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-heading h2 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: #102a43;
+}
+
+.section-heading p {
+    font-size: 18px;
+    color: #486581;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.service-card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #d9e2ec;
+}
+
+.service-card h3 {
+    margin-top: 0;
+    color: #0f4c5c;
+    font-size: 22px;
+}
+
+.service-card p {
+    color: #486581;
+    line-height: 1.6;
+}
