@@ -741,3 +741,53 @@ footer {
     outline: none;
     border-color: #0f4c5c;
 }
+
+/* PRIVACY POLICY / LEGAL PAGES */
+
+.policy-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 70px;
+}
+
+.policy-card {
+    background-color: #ffffff;
+
+    padding: 40px;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 16px;
+}
+
+.policy-updated {
+    color: #829ab1;
+
+    font-size: 15px;
+
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.policy-card h2 {
+    color: #0f4c5c;
+
+    font-size: 24px;
+
+    margin-top: 35px;
+    margin-bottom: 12px;
+}
+
+.policy-card h2:first-of-type {
+    margin-top: 0;
+}
+
+.policy-card p {
+    color: #486581;
+
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.policy-card .primary-button {
+    margin-top: 15px;
+}
