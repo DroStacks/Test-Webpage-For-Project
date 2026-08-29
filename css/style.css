@@ -5,7 +5,63 @@ body {
     color: #1f2933;
 }
 
-header {
+/* HEADER */
+
+/* Small bar at the very top */
+
+.utility-bar {
+    background-color: #0f4c5c;
+    color: #ffffff;
+}
+
+.utility-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 24px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.utility-left,
+.utility-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.utility-bar a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.utility-bar a:hover {
+    text-decoration: underline;
+}
+
+
+/* Patient Login button */
+
+.login-button {
+    background-color: #ffffff;
+    color: #0f4c5c !important;
+
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.login-button:hover {
+    background-color: #e9f5f9;
+    text-decoration: none !important;
+}
+
+
+/* Main navigation */
+
+.main-header {
     background-color: #ffffff;
     border-bottom: 1px solid #d9e2ec;
 }
@@ -13,7 +69,7 @@ header {
 nav {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 18px 24px;
+    padding: 20px 24px;
 
     display: flex;
     justify-content: space-between;
@@ -28,8 +84,11 @@ nav {
 
 .nav-links {
     list-style: none;
+
     display: flex;
+    align-items: center;
     gap: 24px;
+
     margin: 0;
     padding: 0;
 }
