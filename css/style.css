@@ -400,3 +400,42 @@ footer {
     font-size: 14px;
     color: #d9e2ec;
 }
+
+/* GENERAL INNER PAGE HEADING */
+
+.page-heading {
+    text-align: center;
+    padding: 60px 20px 40px;
+}
+
+.page-heading h2 {
+    font-size: 42px;
+    color: #102a43;
+    margin-bottom: 15px;
+}
+
+.page-heading p {
+    font-size: 18px;
+    color: #486581;
+}
+
+
+/* ABOUT PAGE */
+
+.about-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0 60px;
+}
+
+.about-section h2 {
+    color: #0f4c5c;
+    font-size: 28px;
+    margin-top: 40px;
+}
+
+.about-section p {
+    color: #486581;
+    font-size: 18px;
+    line-height: 1.8;
+}
