@@ -640,3 +640,104 @@ footer {
 
     width: fit-content;
 }
+
+/* APPOINTMENT PAGE */
+
+.appointment-layout {
+    display: grid;
+    grid-template-columns: 0.8fr 1.5fr;
+    gap: 40px;
+
+    padding-bottom: 70px;
+}
+
+
+/* Appointment information */
+
+.appointment-info {
+    background-color: #e9f5f9;
+
+    padding: 35px;
+
+    border-radius: 16px;
+}
+
+.appointment-info h2 {
+    color: #102a43;
+
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.appointment-info > p {
+    color: #486581;
+
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+}
+
+.appointment-info-item {
+    margin-top: 30px;
+}
+
+.appointment-info-item h3 {
+    color: #0f4c5c;
+
+    margin-bottom: 10px;
+}
+
+.appointment-info-item p {
+    color: #486581;
+
+    line-height: 1.6;
+
+    margin: 5px 0;
+}
+
+
+/* Appointment form */
+
+.appointment-form-container {
+    background-color: #ffffff;
+
+    padding: 35px;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 16px;
+}
+
+.appointment-form-container h2 {
+    color: #102a43;
+
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.appointment-form {
+    display: grid;
+    gap: 22px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group select {
+    padding: 14px;
+
+    border: 1px solid #bcccdc;
+    border-radius: 8px;
+
+    background-color: #ffffff;
+
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #0f4c5c;
+}
