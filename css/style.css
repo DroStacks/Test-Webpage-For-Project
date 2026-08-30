@@ -1372,12 +1372,12 @@ footer {
 
 .appointment-message {
     margin: 5px 0 0;
-
     padding: 12px 14px;
-
     border-radius: 8px;
-
     font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+}
     line-height: 1.5;
 
     text-align: center;
