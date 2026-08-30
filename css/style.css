@@ -1250,3 +1250,68 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+
+/* ========================================
+   FORGOT PASSWORD PAGE
+======================================== */
+
+.forgot-password-page {
+    min-height: 620px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 70px 20px;
+}
+
+.forgot-password-form {
+    width: 100%;
+    max-width: 460px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    padding: 40px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 24px rgba(16, 42, 67, 0.08);
+
+    box-sizing: border-box;
+}
+
+.forgot-password-form .p {
+    text-align: center;
+
+    color: #486581;
+
+    font-size: 14px;
+
+    margin: 5px 0;
+}
+
+.forgot-password-form .span {
+    color: #0f4c5c;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.forgot-password-form .span:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+
+    .forgot-password-form {
+        padding: 30px 22px;
+    }
+}
