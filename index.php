@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,12 +28,35 @@
                 <span>Language: English</span>
             </div>
 
-            <div class="utility-right">
-                <a href="html/register.html">Register</a>
-                <a href="html/login.html" class="login-button">
-                    Patient Login
-                </a>
-            </div>
+           <div class="utility-right">
+
+    <?php if (isset($_SESSION["user_id"])): ?>
+
+        <span>
+            Welcome, <?php echo htmlspecialchars($_SESSION["first_name"]); ?>
+        </span>
+
+        <a href="php/dashboard.php">
+            Dashboard
+        </a>
+
+        <a href="php/logout.php" class="login-button">
+            Logout
+        </a>
+
+    <?php else: ?>
+
+        <a href="html/register.html">
+            Register
+        </a>
+
+        <a href="html/login.html" class="login-button">
+            Patient Login
+        </a>
+
+    <?php endif; ?>
+
+</div>
 
         </div>
     </div>
@@ -177,7 +204,7 @@
 
 </section>
     
-</main>
+
 </main>
 
 
@@ -226,7 +253,7 @@
 
 
 <script src="js/script.js"></script>
-    <script src="js/script.js"></script>
+    
 
 </body>
 
