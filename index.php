@@ -44,7 +44,7 @@
             </div>
 
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.php">Home</a></li>
                 <li><a href="html/about.html">About</a></li>
                 <li><a href="html/services.html">Services</a></li>
                 <li><a href="html/contact.html">Contact</a></li>
