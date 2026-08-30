@@ -294,7 +294,7 @@ if (contactForm) {
 // Form Validation
 // ========================================
 
-const appointmentForm = document.querySelector(".appointment-form-container form");
+const appointmentForm = document.querySelector(".appointment-form");
 
 if (appointmentForm) {
 
@@ -306,11 +306,12 @@ if (appointmentForm) {
         const lastName = appointmentForm.querySelector('input[name="last_name"]');
         const email = appointmentForm.querySelector('input[name="email"]');
         const phone = appointmentForm.querySelector('input[name="phone"]');
-        const visitType = appointmentForm.querySelector('select[name="visit_type"]');
+        const service = appointmentForm.querySelector('select[name="service"]');
         const preferredDate = appointmentForm.querySelector('input[name="preferred_date"]');
-        const preferredTime = appointmentForm.querySelector('select[name="preferred_time"]');
+        const preferredTime = appointmentForm.querySelector('input[name="preferred_time"]');
         const reason = appointmentForm.querySelector('textarea[name="reason"]');
 
+        // Remove old validation message
         const oldMessage =
             document.getElementById("appointment-form-message");
 
@@ -318,13 +319,14 @@ if (appointmentForm) {
             oldMessage.remove();
         }
 
+        // Create validation message
         const message = document.createElement("p");
 
         message.id = "appointment-form-message";
         message.classList.add("appointment-message");
 
 
-        // First name
+        // Check first name
         if (firstName.value.trim().length < 2) {
 
             message.textContent =
@@ -338,7 +340,7 @@ if (appointmentForm) {
         }
 
 
-        // Last name
+        // Check last name
         if (lastName.value.trim().length < 2) {
 
             message.textContent =
@@ -352,7 +354,7 @@ if (appointmentForm) {
         }
 
 
-        // Email
+        // Check email
         if (!email.validity.valid) {
 
             message.textContent =
@@ -366,7 +368,7 @@ if (appointmentForm) {
         }
 
 
-        // Phone
+        // Check phone number
         if (phone.value.trim().length < 7) {
 
             message.textContent =
@@ -380,8 +382,8 @@ if (appointmentForm) {
         }
 
 
-        // Visit type
-        if (visitType.value === "") {
+        // Check service
+        if (service.value === "") {
 
             message.textContent =
                 "Please select a type of visit.";
@@ -394,7 +396,7 @@ if (appointmentForm) {
         }
 
 
-        // Preferred date
+        // Check preferred date
         if (preferredDate.value === "") {
 
             message.textContent =
@@ -430,7 +432,7 @@ if (appointmentForm) {
         }
 
 
-        // Preferred time
+        // Check preferred time
         if (preferredTime.value === "") {
 
             message.textContent =
@@ -444,7 +446,7 @@ if (appointmentForm) {
         }
 
 
-        // Reason for visit
+        // Check reason for visit
         if (reason.value.trim().length < 10) {
 
             message.textContent =
