@@ -65,8 +65,7 @@ $_SESSION["email"] = $user["email"];
    LOGIN SUCCESS
 ======================================== */
 
-echo "Login successful! Welcome, "
-    . htmlspecialchars($user["first_name"], ENT_QUOTES, "UTF-8")
-    . ".";
+header("Location: dashboard.php");
+exit;
 
 ?>
