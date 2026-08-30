@@ -812,13 +812,11 @@ footer {
 
 .login-heading {
     text-align: center;
-
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .login-heading h2 {
     color: #102a43;
-
     font-size: 38px;
 
     margin: 0 0 10px;
@@ -826,30 +824,31 @@ footer {
 
 .login-heading p {
     color: #486581;
-
     font-size: 17px;
 
     margin: 0;
 }
 
 
-/* Uiverse login form adapted for HealthBridge */
+/* Login card */
 
-.form {
+.login-page .form {
     display: flex;
     flex-direction: column;
 
-    gap: 12px;
+    gap: 14px;
 
     background-color: #ffffff;
 
-    padding: 40px;
+    width: 100%;
+    max-width: 460px;
 
-    width: 450px;
-    max-width: 100%;
+    padding: 40px;
 
     border: 1px solid #d9e2ec;
     border-radius: 16px;
+
+    box-shadow: 0 8px 24px rgba(16, 42, 67, 0.08);
 
     box-sizing: border-box;
 }
@@ -857,218 +856,216 @@ footer {
 
 /* Labels */
 
-.flex-column > label {
+.login-page .flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-page .flex-column label {
     color: #334e68;
 
+    font-size: 15px;
     font-weight: 600;
 }
 
 
-/* Email and password fields */
+/* Input containers */
 
-.inputForm {
-    border: 1.5px solid #bcccdc;
-    border-radius: 10px;
-
-    height: 50px;
+.login-page .inputForm {
+    width: 100%;
+    height: 52px;
 
     display: flex;
     align-items: center;
 
-    padding: 0 12px;
-
-    transition: 0.2s ease-in-out;
+    padding: 0 14px;
 
     background-color: #ffffff;
+
+    border: 1.5px solid #bcccdc;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+    transition: 0.2s ease-in-out;
 }
 
-.inputForm svg {
+.login-page .inputForm:focus-within {
+    border-color: #0f4c5c;
+
+    box-shadow: 0 0 0 3px rgba(15, 76, 92, 0.08);
+}
+
+.login-page .inputForm svg {
     fill: #486581;
 
     flex-shrink: 0;
 }
 
-.input {
-    margin-left: 10px;
 
-    border: none;
+/* Actual input */
 
+.login-page .input {
     width: 100%;
     height: 100%;
 
-    font-size: 15px;
+    margin-left: 10px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
 
     color: #102a43;
 
-    background: transparent;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
 }
 
-.input:focus {
-    outline: none;
-}
-
-.input::placeholder {
+.login-page .input::placeholder {
     color: #829ab1;
 }
 
-.inputForm:focus-within {
-    border-color: #0f4c5c;
-}
 
+/* Eye button */
 
-/* Password eye */
-
-.password-toggle {
-    border: none;
-    background: transparent;
-
-    padding: 5px;
-
+.login-page .password-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
 
+    padding: 5px;
+
+    border: none;
+
+    background-color: transparent;
+
     cursor: pointer;
 }
 
-.password-toggle svg {
+.login-page .password-toggle svg {
     fill: #486581;
 }
 
 
-/* Rows */
+/* Remember / Forgot password row */
 
-.form .flex-row {
+.login-page .flex-row {
     display: flex;
-    flex-direction: row;
-
     align-items: center;
     justify-content: space-between;
 
     gap: 10px;
 }
 
-
-/* Remember me */
-
-.remember-me {
+.login-page .remember-me {
     display: flex;
     align-items: center;
 
     gap: 6px;
 }
 
-.remember-me label {
-    font-size: 14px;
-
+.login-page .remember-me label {
     color: #486581;
 
-    font-weight: 400;
+    font-size: 14px;
 }
 
-
-/* Login links */
-
-.form .span {
-    font-size: 14px;
-
+.login-page .span {
     color: #0f4c5c;
 
+    font-size: 14px;
     font-weight: 600;
 
     text-decoration: none;
-
-    cursor: pointer;
 }
 
-.form .span:hover {
+.login-page .span:hover {
     text-decoration: underline;
 }
 
 
-/* Sign in button */
+/* Sign in */
 
-.button-submit {
-    margin: 20px 0 10px;
+.login-page .button-submit {
+    width: 100%;
+    height: 50px;
 
-    background-color: #0f4c5c;
+    margin-top: 12px;
 
     border: none;
+    border-radius: 10px;
 
+    background-color: #0f4c5c;
     color: #ffffff;
 
     font-size: 16px;
     font-weight: 600;
 
-    border-radius: 10px;
-
-    height: 50px;
-    width: 100%;
-
     cursor: pointer;
 
     transition: 0.2s ease-in-out;
 }
 
-.button-submit:hover {
+.login-page .button-submit:hover {
     background-color: #0b3b47;
 }
 
 
-/* Text underneath button */
+/* Bottom text */
 
-.form .p {
+.login-page .p {
+    margin: 4px 0;
+
     text-align: center;
 
     color: #486581;
 
     font-size: 14px;
+}
 
-    margin: 5px 0;
+.login-page .line {
+    margin-top: 12px;
 }
 
 
-/* Social login buttons */
+/* Google / Apple buttons */
 
-.social-login {
+.login-page .social-login {
     width: 100%;
 }
 
-.form .btn {
-    margin-top: 10px;
-
+.login-page .btn {
     width: 100%;
     height: 50px;
 
-    border-radius: 10px;
-
     display: flex;
-    justify-content: center;
     align-items: center;
-
-    font-weight: 500;
+    justify-content: center;
 
     gap: 10px;
 
     border: 1px solid #d9e2ec;
+    border-radius: 10px;
 
     background-color: #ffffff;
-
     color: #334e68;
+
+    font-weight: 600;
 
     cursor: pointer;
 
     transition: 0.2s ease-in-out;
 }
 
-.form .btn:hover {
+.login-page .btn:hover {
     border-color: #0f4c5c;
 
     background-color: #f7f9fb;
 }
 
 
-/* Mobile login layout */
+/* Mobile */
 
 @media (max-width: 600px) {
 
@@ -1076,7 +1073,7 @@ footer {
         padding: 50px 15px;
     }
 
-    .form {
+    .login-page .form {
         padding: 30px 22px;
     }
 
@@ -1084,7 +1081,7 @@ footer {
         font-size: 32px;
     }
 
-    .social-login {
+    .login-page .social-login {
         flex-direction: column;
     }
 }
