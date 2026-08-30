@@ -288,3 +288,184 @@ if (contactForm) {
     });
 
 }
+
+// ========================================
+// APPOINTMENT PAGE
+// Form Validation
+// ========================================
+
+const appointmentForm = document.querySelector(".appointment-form-container form");
+
+if (appointmentForm) {
+
+    appointmentForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const firstName = appointmentForm.querySelector('input[name="first_name"]');
+        const lastName = appointmentForm.querySelector('input[name="last_name"]');
+        const email = appointmentForm.querySelector('input[name="email"]');
+        const phone = appointmentForm.querySelector('input[name="phone"]');
+        const visitType = appointmentForm.querySelector('select[name="visit_type"]');
+        const preferredDate = appointmentForm.querySelector('input[name="preferred_date"]');
+        const preferredTime = appointmentForm.querySelector('select[name="preferred_time"]');
+        const reason = appointmentForm.querySelector('textarea[name="reason"]');
+
+        const oldMessage =
+            document.getElementById("appointment-form-message");
+
+        if (oldMessage) {
+            oldMessage.remove();
+        }
+
+        const message = document.createElement("p");
+
+        message.id = "appointment-form-message";
+        message.classList.add("appointment-message");
+
+
+        // First name
+        if (firstName.value.trim().length < 2) {
+
+            message.textContent =
+                "Please enter your first name.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Last name
+        if (lastName.value.trim().length < 2) {
+
+            message.textContent =
+                "Please enter your last name.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Email
+        if (!email.validity.valid) {
+
+            message.textContent =
+                "Please enter a valid email address.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Phone
+        if (phone.value.trim().length < 7) {
+
+            message.textContent =
+                "Please enter a valid phone number.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Visit type
+        if (visitType.value === "") {
+
+            message.textContent =
+                "Please select a type of visit.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Preferred date
+        if (preferredDate.value === "") {
+
+            message.textContent =
+                "Please select a preferred appointment date.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Prevent past dates
+        const selectedDate = new Date(
+            preferredDate.value + "T00:00:00"
+        );
+
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+
+            message.textContent =
+                "Please choose a date that is today or later.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Preferred time
+        if (preferredTime.value === "") {
+
+            message.textContent =
+                "Please select a preferred appointment time.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Reason for visit
+        if (reason.value.trim().length < 10) {
+
+            message.textContent =
+                "Please provide a brief reason for your visit.";
+
+            message.classList.add("error-message");
+
+            appointmentForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Everything passed
+        message.textContent =
+            "Your appointment request looks good! Submission will be enabled when the backend is connected.";
+
+        message.classList.add("success-message");
+
+        appointmentForm.appendChild(message);
+
+    });
+
+}
