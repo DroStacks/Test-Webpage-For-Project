@@ -102,3 +102,89 @@ if (confirmPassword && confirmPasswordToggle) {
     });
 
 }
+
+// ========================================
+// REGISTER PAGE
+// Form Validation
+// ========================================
+
+const registerForm = document.querySelector(".register-form");
+
+if (registerForm) {
+
+    registerForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const password = document.getElementById("register-password");
+        const confirmPassword = document.getElementById("confirm-password");
+        const agreement = document.getElementById("register-agreement");
+
+        // Remove old message if one already exists
+        const oldMessage = document.getElementById("register-message");
+
+        if (oldMessage) {
+            oldMessage.remove();
+        }
+
+
+        // Create message
+        const message = document.createElement("p");
+
+        message.id = "register-message";
+        message.classList.add("register-message");
+
+
+        // Check password length
+        if (password.value.length < 8) {
+
+            message.textContent =
+                "Password must be at least 8 characters long.";
+
+            message.classList.add("error-message");
+
+            registerForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Check if passwords match
+        if (password.value !== confirmPassword.value) {
+
+            message.textContent =
+                "Passwords do not match.";
+
+            message.classList.add("error-message");
+
+            registerForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Check terms checkbox
+        if (!agreement.checked) {
+
+            message.textContent =
+                "Please agree to the Terms and Conditions and Privacy Policy.";
+
+            message.classList.add("error-message");
+
+            registerForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Everything passed
+        message.textContent =
+            "Registration form looks good! Account creation will be enabled when the backend is connected.";
+
+        message.classList.add("success-message");
+
+        registerForm.appendChild(message);
+
+    });
+
+}
