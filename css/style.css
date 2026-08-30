@@ -1315,3 +1315,36 @@ footer {
         padding: 30px 22px;
     }
 }
+
+/* ========================================
+   REGISTER FORM MESSAGES
+======================================== */
+
+.register-message {
+    margin: 5px 0 0;
+
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+.error-message {
+    background-color: #fff1f0;
+
+    border: 1px solid #f5c2c0;
+
+    color: #9b2c2c;
+}
+
+.success-message {
+    background-color: #edf8f3;
+
+    border: 1px solid #b7dfcc;
+
+    color: #276749;
+}
