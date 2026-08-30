@@ -1085,3 +1085,168 @@ footer {
         flex-direction: column;
     }
 }
+
+/* ========================================
+   REGISTER PAGE
+======================================== */
+
+.register-page {
+    min-height: 700px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 70px 20px;
+}
+
+.register-form {
+    width: 100%;
+    max-width: 560px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    padding: 40px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 24px rgba(16, 42, 67, 0.08);
+
+    box-sizing: border-box;
+}
+
+.register-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.register-field label {
+    color: #334e68;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.register-field input {
+    height: 52px;
+
+    padding: 0 14px;
+
+    border: 1.5px solid #bcccdc;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    color: #102a43;
+}
+
+.register-field input:focus {
+    outline: none;
+
+    border-color: #0f4c5c;
+
+    box-shadow: 0 0 0 3px rgba(15, 76, 92, 0.08);
+}
+
+.register-field input::placeholder {
+    color: #829ab1;
+}
+
+
+/* Password field with eye button */
+
+.register-password-wrapper {
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1.5px solid #bcccdc;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+}
+
+.register-password-wrapper:focus-within {
+    border-color: #0f4c5c;
+
+    box-shadow: 0 0 0 3px rgba(15, 76, 92, 0.08);
+}
+
+.register-password-wrapper input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+
+    box-shadow: none;
+}
+
+.register-password-wrapper input:focus {
+    border: none;
+
+    box-shadow: none;
+}
+
+.register-password-wrapper .password-toggle {
+    margin-right: 8px;
+}
+
+
+/* Agreement */
+
+.register-agreement {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 8px;
+}
+
+.register-agreement input {
+    margin-top: 3px;
+}
+
+.register-agreement label {
+    color: #486581;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.register-agreement a {
+    color: #0f4c5c;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.register-agreement a:hover {
+    text-decoration: underline;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .register-form {
+        padding: 30px 22px;
+    }
+
+    .register-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}
