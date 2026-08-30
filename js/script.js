@@ -114,8 +114,6 @@ if (registerForm) {
 
     registerForm.addEventListener("submit", function (event) {
 
-        event.preventDefault();
-
         const password = document.getElementById("register-password");
         const confirmPassword = document.getElementById("confirm-password");
         const agreement = document.getElementById("register-agreement");
@@ -138,6 +136,8 @@ if (registerForm) {
         // Check password length
         if (password.value.length < 8) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Password must be at least 8 characters long.";
 
@@ -151,6 +151,8 @@ if (registerForm) {
 
         // Check if passwords match
         if (password.value !== confirmPassword.value) {
+
+            event.preventDefault();
 
             message.textContent =
                 "Passwords do not match.";
@@ -166,6 +168,8 @@ if (registerForm) {
         // Check terms checkbox
         if (!agreement.checked) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please agree to the Terms and Conditions and Privacy Policy.";
 
@@ -176,14 +180,8 @@ if (registerForm) {
             return;
         }
 
-
-        // Everything passed
-        message.textContent =
-            "Registration form looks good! Account creation will be enabled when the backend is connected.";
-
-        message.classList.add("success-message");
-
-        registerForm.appendChild(message);
+        // If validation passes,
+        // the form continues to register.php
 
     });
 
