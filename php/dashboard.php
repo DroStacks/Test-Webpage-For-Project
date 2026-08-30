@@ -63,7 +63,7 @@ $firstName = $_SESSION["first_name"];
 
                 <ul class="nav-links">
                     <li><a href="../index.php">Home</a></li>
-                    <li><a href="../html/services.html">Services</a></li>
+                    <li><a href="../html/services.php">Services</a></li>
                     <li><a href="../html/appointment.html">Appointments</a></li>
                 </ul>
 
