@@ -3,7 +3,7 @@
 session_start();
 
 if (!isset($_SESSION["user_id"])) {
-    header("Location: ../html/login.html");
+    header("Location: ../html/login.php");
     exit;
 }
 
@@ -32,7 +32,7 @@ $firstName = $_SESSION["first_name"];
             <div class="utility-content">
 
                 <div class="utility-left">
-                    <a href="../html/contact.html">Support Center</a>
+                    <a href="../html/contact.php">Support Center</a>
                     <span>|</span>
                     <span>Language: English</span>
                 </div>
@@ -64,7 +64,7 @@ $firstName = $_SESSION["first_name"];
                 <ul class="nav-links">
                     <li><a href="../index.php">Home</a></li>
                     <li><a href="../html/services.php">Services</a></li>
-                    <li><a href="../html/appointment.html">Appointments</a></li>
+                    <li><a href="../html/appointment.php">Appointments</a></li>
                 </ul>
 
             </nav>

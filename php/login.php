@@ -5,7 +5,7 @@ session_start();
 require_once "/etc/healthbridge/db.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: ../html/login.html");
+    header("Location: ../html/login.php");
     exit;
 }
 

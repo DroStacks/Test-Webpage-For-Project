@@ -23,7 +23,7 @@ session_start();
         <div class="utility-content">
 
             <div class="utility-left">
-                <a href="html/contact.html">Support Center</a>
+                <a href="html/contact.php">Support Center</a>
                 <span>|</span>
                 <span>Language: English</span>
             </div>
@@ -46,11 +46,11 @@ session_start();
 
     <?php else: ?>
 
-        <a href="html/register.html">
+        <a href="html/register.php">
             Register
         </a>
 
-        <a href="html/login.html" class="login-button">
+        <a href="html/login.php" class="login-button">
             Patient Login
         </a>
 
@@ -72,10 +72,10 @@ session_start();
 
             <ul class="nav-links">
                 <li><a href="index.php">Home</a></li>
-                <li><a href="html/about.html">About</a></li>
-                <li><a href="html/services.html">Services</a></li>
-                <li><a href="html/contact.html">Contact</a></li>
-                <li><a href="html/appointment.html">Appointments</a></li>
+                <li><a href="html/about.php">About</a></li>
+                <li><a href="html/services.php">Services</a></li>
+                <li><a href="html/contact.php">Contact</a></li>
+                <li><a href="html/appointment.php">Appointments</a></li>
             </ul>
 
         </nav>
@@ -100,11 +100,11 @@ session_start();
 
         <div class="hero-buttons">
 
-            <a href="html/appointment.html" class="primary-button">
+            <a href="html/appointment.php" class="primary-button">
                 Request Appointment
             </a>
 
-            <a href="html/services.html" class="secondary-button">
+            <a href="html/services.php" class="secondary-button">
                 View Services
             </a>
 
@@ -226,12 +226,12 @@ session_start();
 
             <div class="footer-links">
 
-                <a href="html/about.html">About</a>
-    <a href="html/contact.html">Contact</a>
-    <a href="html/login.html">Patient Login</a>
-    <a href="html/privacy.html">Privacy Policy</a>
-    <a href="html/terms.html">Terms and Conditions</a>
-    <a href="html/accessibility.html">Accessibility</a>
+                <a href="html/about.php">About</a>
+    <a href="html/contact.php">Contact</a>
+    <a href="html/login.php">Patient Login</a>
+    <a href="html/privacy.php">Privacy Policy</a>
+    <a href="html/terms.php">Terms and Conditions</a>
+    <a href="html/accessibility.php">Accessibility</a>
 
             </div>
 
