@@ -194,7 +194,7 @@ if (registerForm) {
 // Form Validation
 // ========================================
 
-const contactForm = document.querySelector(".contact-form-container form");
+const contactForm = document.querySelector(".contact-form");
 
 if (contactForm) {
 
@@ -207,15 +207,17 @@ if (contactForm) {
         const subject = contactForm.querySelector('input[name="subject"]');
         const messageField = contactForm.querySelector('textarea[name="message"]');
 
-        const oldMessage = document.getElementById("contact-message");
+        // Remove old validation message
+        const oldMessage = document.getElementById("contact-form-message");
 
         if (oldMessage) {
             oldMessage.remove();
         }
 
+        // Create validation message
         const message = document.createElement("p");
 
-        message.id = "contact-message";
+        message.id = "contact-form-message";
         message.classList.add("contact-message");
 
 
