@@ -188,3 +188,101 @@ if (registerForm) {
     });
 
 }
+
+// ========================================
+// CONTACT PAGE
+// Form Validation
+// ========================================
+
+const contactForm = document.querySelector(".contact-form-container form");
+
+if (contactForm) {
+
+    contactForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const name = contactForm.querySelector('input[name="name"]');
+        const email = contactForm.querySelector('input[name="email"]');
+        const subject = contactForm.querySelector('input[name="subject"]');
+        const messageField = contactForm.querySelector('textarea[name="message"]');
+
+        const oldMessage = document.getElementById("contact-message");
+
+        if (oldMessage) {
+            oldMessage.remove();
+        }
+
+        const message = document.createElement("p");
+
+        message.id = "contact-message";
+        message.classList.add("contact-message");
+
+
+        // Check name
+        if (name.value.trim().length < 2) {
+
+            message.textContent =
+                "Please enter your full name.";
+
+            message.classList.add("error-message");
+
+            contactForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Check email
+        if (!email.validity.valid) {
+
+            message.textContent =
+                "Please enter a valid email address.";
+
+            message.classList.add("error-message");
+
+            contactForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Check subject
+        if (subject.value.trim().length < 3) {
+
+            message.textContent =
+                "Please enter a subject.";
+
+            message.classList.add("error-message");
+
+            contactForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Check message
+        if (messageField.value.trim().length < 10) {
+
+            message.textContent =
+                "Please enter a message with at least 10 characters.";
+
+            message.classList.add("error-message");
+
+            contactForm.appendChild(message);
+
+            return;
+        }
+
+
+        // Everything passed
+        message.textContent =
+            "Your message looks good! Sending will be enabled when the backend is connected.";
+
+        message.classList.add("success-message");
+
+        contactForm.appendChild(message);
+
+    });
+
+}
