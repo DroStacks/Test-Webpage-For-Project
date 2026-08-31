@@ -165,7 +165,10 @@ session_start();
 
                     </ul>
 
-                    <a href="register.php" class="membership-button">
+                    <a
+                        href="checkout.php?plan=essential"
+                        class="membership-button"
+                    >
                         Choose Essential
                     </a>
 
@@ -225,7 +228,10 @@ session_start();
 
                     </ul>
 
-                    <a href="register.php" class="membership-button">
+                    <a
+                        href="checkout.php?plan=plus"
+                        class="membership-button"
+                    >
                         Choose Plus
                     </a>
 
@@ -281,7 +287,10 @@ session_start();
 
                     </ul>
 
-                    <a href="register.php" class="membership-button">
+                    <a
+                        href="checkout.php?plan=premier"
+                        class="membership-button"
+                    >
                         Choose Premier
                     </a>
 
