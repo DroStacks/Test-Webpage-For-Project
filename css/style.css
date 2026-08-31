@@ -1869,3 +1869,24 @@ footer {
         flex-direction: column;
     }
 }
+
+/* =========================
+   Checkout Submit Button
+========================= */
+
+.checkout-form .button-submit {
+    width: 100%;
+    background: #0f4c5c;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.checkout-form .button-submit:hover {
+    opacity: 0.9;
+}
