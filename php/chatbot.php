@@ -137,7 +137,7 @@ TEXT;
 
 // Build request for OpenAI Responses API
 $requestData = [
-    "model" => "gpt-5.4",
+    "model" => "gpt-5.6-luna",
     "instructions" => $instructions,
     "input" => $message,
     "max_output_tokens" => 300
