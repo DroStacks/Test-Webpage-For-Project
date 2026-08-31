@@ -131,9 +131,20 @@ session_start();
 
             <div class="contact-form-container">
 
-                <h2>Send Us a Message</h2>
+    <h2>Send Us a Message</h2>
 
-                <form action="../php/contact.php" method="post" class="contact-form">
+    <?php if (
+        isset($_GET["message"]) &&
+        $_GET["message"] === "success"
+    ): ?>
+
+        <div class="dashboard-success">
+            Your message was sent successfully.
+        </div>
+
+    <?php endif; ?>
+
+    <form action="../php/contact.php" method="post" class="contact-form">
 
                     <div class="form-group">
                         <label for="contact-name">Full Name</label>
