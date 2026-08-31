@@ -99,7 +99,7 @@ session_start();
             </div>
 
 
-            <form class="forgot-password-form" action="#" method="post">
+            <form class="forgot-password-form" action="../php/forgot-password.php" method="post">
 
                 <div class="register-field">
 
