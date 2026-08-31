@@ -12,7 +12,7 @@ session_start();
 
     <title>Register | HealthBridge Medical</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=2">
     <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
