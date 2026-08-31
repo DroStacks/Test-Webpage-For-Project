@@ -616,7 +616,50 @@ $appointmentHistory = $stmt->fetchAll();
         </section>
 
     </main>
+      <footer>
 
+    <div class="footer-main">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <h2>HealthBridge Medical</h2>
+
+                <p>
+                    Connecting patients with convenient and accessible
+                    healthcare services.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <a href="../html/about.php">About</a>
+                <a href="../html/contact.php">Contact</a>
+                <a href="../html/membership.php">Memberships</a>
+                <a href="../html/privacy.php">Privacy Policy</a>
+                <a href="../html/terms.php">Terms and Conditions</a>
+                <a href="../html/accessibility.php">Accessibility</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 HealthBridge Medical. This website is a mock
+            educational project and does not provide real medical
+            services.
+        </p>
+
+    </div>
+
+</footer>
+    
 </body>
 
 </html>
