@@ -138,6 +138,18 @@ $appointments = $stmt->fetchAll();
             <?php endif; ?>
 
 
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "cancelled"
+            ): ?>
+
+                <div class="dashboard-success">
+                    Your appointment was cancelled successfully.
+                </div>
+
+            <?php endif; ?>
+
+
             <div class="dashboard-grid">
 
                 <div class="dashboard-section">
@@ -228,6 +240,34 @@ $appointments = $stmt->fetchAll();
                                             "UTF-8"
                                         ); ?>
                                     </p>
+
+
+                                    <?php if (
+                                        $appointment["status"] === "Scheduled"
+                                    ): ?>
+
+                                        <form
+                                            action="cancel-appointment.php"
+                                            method="post"
+                                            class="cancel-appointment-form"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="appointment_id"
+                                                value="<?php echo (int) $appointment["id"]; ?>"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="dashboard-button dashboard-cancel"
+                                            >
+                                                Cancel Appointment
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
 
                                 </div>
 
