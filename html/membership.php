@@ -101,13 +101,13 @@ session_start();
                 </span>
 
                 <h2>
-                    Choose the level of care that fits you.
+                    Simple monthly healthcare memberships.
                 </h2>
 
                 <p>
-                    HealthBridge memberships are designed to provide
-                    convenient access, personalized support, and additional
-                    healthcare services for our members.
+                    Choose a membership based on how much access,
+                    convenience, and support you want from HealthBridge
+                    Medical.
                 </p>
 
             </div>
@@ -119,30 +119,50 @@ session_start();
 
             <div class="membership-grid">
 
+
+                <!-- Essential Plan -->
+
                 <div class="membership-card">
 
                     <h3>Essential</h3>
 
                     <p class="membership-description">
-                        A simple option for patients who want convenient
-                        access to core HealthBridge services.
+                        A flexible option for patients who want access
+                        to essential HealthBridge services at an
+                        affordable monthly price.
                     </p>
 
                     <div class="membership-price">
-                        <span class="price">$49</span>
+                        <span class="price">$39</span>
                         <span class="price-period">/ month</span>
                     </div>
 
-                    <p class="annual-price">
-                        $499 billed annually
-                    </p>
-
                     <ul class="membership-benefits">
-                        <li>Patient portal access</li>
-                        <li>Online appointment scheduling</li>
-                        <li>Secure account access</li>
-                        <li>General care coordination</li>
-                        <li>Standard appointment availability</li>
+
+                        <li>
+                            Patient portal access
+                        </li>
+
+                        <li>
+                            Online appointment scheduling
+                        </li>
+
+                        <li>
+                            Standard appointment availability
+                        </li>
+
+                        <li>
+                            General care coordination
+                        </li>
+
+                        <li>
+                            $30 primary care visit fee
+                        </li>
+
+                        <li>
+                            $25 virtual visit fee
+                        </li>
+
                     </ul>
 
                     <a href="register.php" class="membership-button">
@@ -151,6 +171,8 @@ session_start();
 
                 </div>
 
+
+                <!-- Plus Plan -->
 
                 <div class="membership-card featured">
 
@@ -161,26 +183,46 @@ session_start();
                     <h3>Plus</h3>
 
                     <p class="membership-description">
-                        Expanded access and additional convenience for
-                        patients who want more personalized support.
+                        Designed for patients who want faster access,
+                        lower visit fees, and additional healthcare
+                        support.
                     </p>
 
                     <div class="membership-price">
-                        <span class="price">$99</span>
+                        <span class="price">$79</span>
                         <span class="price-period">/ month</span>
                     </div>
 
-                    <p class="annual-price">
-                        $999 billed annually
-                    </p>
-
                     <ul class="membership-benefits">
-                        <li>Everything in Essential</li>
-                        <li>Priority appointment scheduling</li>
-                        <li>Virtual care access</li>
-                        <li>Expanded wellness services</li>
-                        <li>Enhanced care coordination</li>
-                        <li>Priority patient support</li>
+
+                        <li>
+                            Everything included in Essential
+                        </li>
+
+                        <li>
+                            Priority appointment scheduling
+                        </li>
+
+                        <li>
+                            Expanded wellness services
+                        </li>
+
+                        <li>
+                            Enhanced care coordination
+                        </li>
+
+                        <li>
+                            Priority patient support
+                        </li>
+
+                        <li>
+                            $20 primary care visit fee
+                        </li>
+
+                        <li>
+                            $10 virtual visit fee
+                        </li>
+
                     </ul>
 
                     <a href="register.php" class="membership-button">
@@ -190,31 +232,53 @@ session_start();
                 </div>
 
 
+                <!-- Premier Plan -->
+
                 <div class="membership-card">
 
                     <h3>Premier</h3>
 
                     <p class="membership-description">
-                        Our highest level of membership for patients seeking
-                        premium access and greater care convenience.
+                        Premium access for patients who want our
+                        highest level of convenience, support, and
+                        routine care benefits.
                     </p>
 
                     <div class="membership-price">
-                        <span class="price">$199</span>
+                        <span class="price">$149</span>
                         <span class="price-period">/ month</span>
                     </div>
 
-                    <p class="annual-price">
-                        $1,999 billed annually
-                    </p>
-
                     <ul class="membership-benefits">
-                        <li>Everything in Plus</li>
-                        <li>Highest scheduling priority</li>
-                        <li>Extended virtual care access</li>
-                        <li>Personalized wellness planning</li>
-                        <li>Premium care coordination</li>
-                        <li>Dedicated member support</li>
+
+                        <li>
+                            Everything included in Plus
+                        </li>
+
+                        <li>
+                            Highest scheduling priority
+                        </li>
+
+                        <li>
+                            Personalized wellness planning
+                        </li>
+
+                        <li>
+                            Premium care coordination
+                        </li>
+
+                        <li>
+                            Dedicated member support
+                        </li>
+
+                        <li>
+                            $0 routine primary care visit fee
+                        </li>
+
+                        <li>
+                            $0 virtual visit fee
+                        </li>
+
                     </ul>
 
                     <a href="register.php" class="membership-button">
@@ -228,13 +292,13 @@ session_start();
 
             <div class="membership-disclaimer">
 
-                <h3>Important Information</h3>
+                <h3>Membership Information</h3>
 
                 <p>
-                    HealthBridge Medical memberships are part of this
-                    educational mock website and do not represent real
-                    medical services or insurance coverage. Membership
-                    plans are not health insurance.
+                    HealthBridge Medical memberships are not health
+                    insurance. Membership fees and member visit fees
+                    shown on this website are fictional and are used
+                    only for this educational project.
                 </p>
 
             </div>
