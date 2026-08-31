@@ -343,6 +343,109 @@ $appointmentHistory = $stmt->fetchAll();
                         Schedule an Appointment
                     </a>
 
+                                </div>
+
+
+                <div class="dashboard-section">
+
+                    <h3>Appointment History</h3>
+
+                    <?php if (count($appointmentHistory) > 0): ?>
+
+                        <div class="appointment-list">
+
+                            <?php foreach ($appointmentHistory as $appointment): ?>
+
+                                <?php
+
+                                $serviceNames = [
+                                    "primary-care" => "Primary Care",
+                                    "preventive-care" => "Preventive Care",
+                                    "family-medicine" => "Family Medicine"
+                                ];
+
+                                $serviceName =
+                                    $serviceNames[$appointment["service"]]
+                                    ?? $appointment["service"];
+
+                                $formattedDate = date(
+                                    "F j, Y",
+                                    strtotime($appointment["appointment_date"])
+                                );
+
+                                $formattedTime = date(
+                                    "g:i A",
+                                    strtotime($appointment["appointment_time"])
+                                );
+
+                                ?>
+
+                                <div class="appointment-item">
+
+                                    <div class="appointment-item-header">
+
+                                        <h4>
+                                            <?php echo htmlspecialchars(
+                                                $serviceName,
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ); ?>
+                                        </h4>
+
+                                        <span class="appointment-status">
+                                            <?php echo htmlspecialchars(
+                                                $appointment["status"],
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ); ?>
+                                        </span>
+
+                                    </div>
+
+                                    <p>
+                                        <strong>Date:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $formattedDate,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+                                    <p>
+                                        <strong>Time:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $formattedTime,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+                                    <p>
+                                        <strong>Reason:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $appointment["reason"],
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php else: ?>
+
+                        <p class="dashboard-empty">
+                            You do not have any appointment history yet.
+                        </p>
+
+                    <?php endif; ?>
+
                 </div>
 
 
