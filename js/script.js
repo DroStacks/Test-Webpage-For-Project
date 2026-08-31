@@ -198,8 +198,6 @@ if (contactForm) {
 
     contactForm.addEventListener("submit", function (event) {
 
-        event.preventDefault();
-
         const name = contactForm.querySelector('input[name="name"]');
         const email = contactForm.querySelector('input[name="email"]');
         const subject = contactForm.querySelector('input[name="subject"]');
@@ -222,6 +220,8 @@ if (contactForm) {
         // Check name
         if (name.value.trim().length < 2) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please enter your full name.";
 
@@ -235,6 +235,8 @@ if (contactForm) {
 
         // Check email
         if (!email.validity.valid) {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please enter a valid email address.";
@@ -250,6 +252,8 @@ if (contactForm) {
         // Check subject
         if (subject.value.trim().length < 3) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please enter a subject.";
 
@@ -264,6 +268,8 @@ if (contactForm) {
         // Check message
         if (messageField.value.trim().length < 10) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please enter a message with at least 10 characters.";
 
@@ -274,14 +280,7 @@ if (contactForm) {
             return;
         }
 
-
-        // Everything passed
-        message.textContent =
-            "Your message looks good! Sending will be enabled when the backend is connected.";
-
-        message.classList.add("success-message");
-
-        contactForm.appendChild(message);
+        // If everything passes, the form submits normally to PHP.
 
     });
 
