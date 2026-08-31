@@ -131,7 +131,7 @@ session_start();
 
                 <h2>Appointment Request Form</h2>
 
-                <form action="#" method="post" class="appointment-form">
+                <form action="../php/appointment.php" method="post" class="appointment-form">
 
                     <div class="form-row">
 
@@ -215,11 +215,11 @@ session_start();
                                 Preferred Date
                             </label>
 
-                            <input
-                                type="date"
-                                id="preferred-date"
-                                name="preferred_date"
-                                required
+                            <input 
+                                type="date" 
+                                id="preferred-date" 
+                                name="appointment_date" 
+                                required 
                             >
                         </div>
 
@@ -229,11 +229,11 @@ session_start();
                                 Preferred Time
                             </label>
 
-                            <input
-                                type="time"
-                                id="preferred-time"
-                                name="preferred_time"
-                                required
+                            <input 
+                                type="time" 
+                                id="preferred-time" 
+                                name="appointment_time" 
+                                required 
                             >
                         </div>
 
