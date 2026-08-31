@@ -133,7 +133,7 @@ session_start();
 
                 <h2>Send Us a Message</h2>
 
-                <form action="#" method="post" class="contact-form">
+                <form action="../php/contact.php" method="post" class="contact-form">
 
                     <div class="form-group">
                         <label for="contact-name">Full Name</label>
