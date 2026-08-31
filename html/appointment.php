@@ -115,6 +115,7 @@ session_start();
                     <h3>Office Hours</h3>
                     <p>Monday - Friday: 8:00 AM - 5:00 PM</p>
                     <p>Saturday: 9:00 AM - 1:00 PM</p>
+                    <p>Sunday: Closed</p>
                 </div>
 
                 <div class="appointment-info-item">
