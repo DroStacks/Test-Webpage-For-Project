@@ -28,7 +28,7 @@ $stmt->execute([$userId]);
 $membership = $stmt->fetch();
 
 
-// Get this user's upcoming appointments
+// Get this user's upcoming active appointments
 $stmt = $pdo->prepare(
     "SELECT
         id,
@@ -40,12 +40,36 @@ $stmt = $pdo->prepare(
      FROM appointments
      WHERE user_id = ?
        AND appointment_date >= CURDATE()
+       AND status = 'Scheduled'
      ORDER BY appointment_date ASC, appointment_time ASC"
 );
 
 $stmt->execute([$userId]);
 
 $appointments = $stmt->fetchAll();
+
+
+// Get this user's appointment history
+$stmt = $pdo->prepare(
+    "SELECT
+        id,
+        appointment_date,
+        appointment_time,
+        service,
+        reason,
+        status
+     FROM appointments
+     WHERE user_id = ?
+       AND (
+            appointment_date < CURDATE()
+            OR status <> 'Scheduled'
+       )
+     ORDER BY appointment_date DESC, appointment_time DESC"
+);
+
+$stmt->execute([$userId]);
+
+$appointmentHistory = $stmt->fetchAll();
 
 ?>
 
