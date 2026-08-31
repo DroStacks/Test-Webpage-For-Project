@@ -1731,3 +1731,19 @@ footer {
 .appointment-item p {
     margin: 7px 0;
 }
+
+/* =========================
+   Cancel Appointment
+========================= */
+
+.cancel-appointment-form {
+    margin-top: 16px;
+}
+
+.dashboard-cancel {
+    background: #8b2f2f;
+}
+
+.dashboard-cancel:hover {
+    opacity: 0.9;
+}
