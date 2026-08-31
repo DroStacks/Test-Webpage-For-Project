@@ -317,7 +317,9 @@ session_start();
     </main>
 
 
-    <footer>
+   <footer>
+
+    <div class="footer-main">
 
         <div class="footer-content">
 
@@ -346,17 +348,19 @@ session_start();
 
         </div>
 
-        <div class="footer-bottom">
+    </div>
 
-            <p>
-                © 2026 HealthBridge Medical. This website is a mock
-                educational project and does not provide real medical
-                services.
-            </p>
+    <div class="footer-bottom">
 
-        </div>
+        <p>
+            © 2026 HealthBridge Medical. This website is a mock
+            educational project and does not provide real medical
+            services.
+        </p>
 
-    </footer>
+    </div>
+
+</footer>
 
 </body>
 
