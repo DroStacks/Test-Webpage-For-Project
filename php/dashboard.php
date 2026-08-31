@@ -92,6 +92,7 @@ $appointments = $stmt->fetchAll();
                 <ul class="nav-links">
                     <li><a href="../index.php">Home</a></li>
                     <li><a href="../html/services.php">Services</a></li>
+                    <li><a href="../html/membership.php">Memberships</a></li>
                     <li><a href="../html/appointment.php">Appointments</a></li>
                     <li><a href="../html/contact.php">Contact</a></li>
                 </ul>
