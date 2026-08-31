@@ -298,15 +298,13 @@ if (appointmentForm) {
 
     appointmentForm.addEventListener("submit", function (event) {
 
-        event.preventDefault();
-
         const firstName = appointmentForm.querySelector('input[name="first_name"]');
         const lastName = appointmentForm.querySelector('input[name="last_name"]');
         const email = appointmentForm.querySelector('input[name="email"]');
         const phone = appointmentForm.querySelector('input[name="phone"]');
         const service = appointmentForm.querySelector('select[name="service"]');
-        const preferredDate = appointmentForm.querySelector('input[name="preferred_date"]');
-        const preferredTime = appointmentForm.querySelector('input[name="preferred_time"]');
+        const appointmentDate = appointmentForm.querySelector('input[name="appointment_date"]');
+        const appointmentTime = appointmentForm.querySelector('input[name="appointment_time"]');
         const reason = appointmentForm.querySelector('textarea[name="reason"]');
 
         // Remove old validation message
@@ -327,6 +325,8 @@ if (appointmentForm) {
         // Check first name
         if (firstName.value.trim().length < 2) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please enter your first name.";
 
@@ -340,6 +340,8 @@ if (appointmentForm) {
 
         // Check last name
         if (lastName.value.trim().length < 2) {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please enter your last name.";
@@ -355,6 +357,8 @@ if (appointmentForm) {
         // Check email
         if (!email.validity.valid) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please enter a valid email address.";
 
@@ -368,6 +372,8 @@ if (appointmentForm) {
 
         // Check phone number
         if (phone.value.trim().length < 7) {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please enter a valid phone number.";
@@ -383,6 +389,8 @@ if (appointmentForm) {
         // Check service
         if (service.value === "") {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please select a type of visit.";
 
@@ -394,8 +402,10 @@ if (appointmentForm) {
         }
 
 
-        // Check preferred date
-        if (preferredDate.value === "") {
+        // Check appointment date
+        if (appointmentDate.value === "") {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please select a preferred appointment date.";
@@ -410,7 +420,7 @@ if (appointmentForm) {
 
         // Prevent past dates
         const selectedDate = new Date(
-            preferredDate.value + "T00:00:00"
+            appointmentDate.value + "T00:00:00"
         );
 
         const today = new Date();
@@ -418,6 +428,8 @@ if (appointmentForm) {
         today.setHours(0, 0, 0, 0);
 
         if (selectedDate < today) {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please choose a date that is today or later.";
@@ -430,8 +442,10 @@ if (appointmentForm) {
         }
 
 
-        // Check preferred time
-        if (preferredTime.value === "") {
+        // Check appointment time
+        if (appointmentTime.value === "") {
+
+            event.preventDefault();
 
             message.textContent =
                 "Please select a preferred appointment time.";
@@ -447,6 +461,8 @@ if (appointmentForm) {
         // Check reason for visit
         if (reason.value.trim().length < 10) {
 
+            event.preventDefault();
+
             message.textContent =
                 "Please provide a brief reason for your visit.";
 
@@ -457,14 +473,8 @@ if (appointmentForm) {
             return;
         }
 
-
-        // Everything passed
-        message.textContent =
-            "Your appointment request looks good! Submission will be enabled when the backend is connected.";
-
-        message.classList.add("success-message");
-
-        appointmentForm.appendChild(message);
+        // If all validation passes,
+        // the form submits normally to PHP.
 
     });
 
