@@ -57,10 +57,7 @@ $selectedPlan = $plans[$plan];
         Membership Checkout | HealthBridge Medical
     </title>
 
-    <link
-        rel="stylesheet"
-        href="../css/style.css"
-    >
+   <link rel="stylesheet" href="../css/style.css?v=2">
 
     <link
         rel="icon"
