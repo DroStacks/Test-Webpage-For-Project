@@ -13,6 +13,21 @@ $userId = $_SESSION["user_id"];
 $firstName = $_SESSION["first_name"];
 $email = $_SESSION["email"] ?? "";
 
+// Get this user's membership information
+$stmt = $pdo->prepare(
+    "SELECT
+        membership_plan,
+        membership_status,
+        membership_started_at
+     FROM users
+     WHERE id = ?"
+);
+
+$stmt->execute([$userId]);
+
+$membership = $stmt->fetch();
+
+
 // Get this user's upcoming appointments
 $stmt = $pdo->prepare(
     "SELECT
@@ -146,6 +161,18 @@ $appointments = $stmt->fetchAll();
 
                 <div class="dashboard-success">
                     Your appointment was cancelled successfully.
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                isset($_GET["membership"]) &&
+                $_GET["membership"] === "success"
+            ): ?>
+
+                <div class="dashboard-success">
+                    Your HealthBridge Medical membership was activated successfully.
                 </div>
 
             <?php endif; ?>
@@ -324,6 +351,84 @@ $appointments = $stmt->fetchAll();
 
                 <div class="dashboard-section">
 
+                    <h3>Membership</h3>
+
+                    <?php if (
+                        !empty($membership["membership_plan"]) &&
+                        $membership["membership_status"] === "Active"
+                    ): ?>
+
+                        <p>
+                            <strong>Plan:</strong>
+
+                            <?php echo htmlspecialchars(
+                                $membership["membership_plan"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ); ?>
+                        </p>
+
+
+                        <p>
+                            <strong>Status:</strong>
+
+                            <?php echo htmlspecialchars(
+                                $membership["membership_status"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ); ?>
+                        </p>
+
+
+                        <?php if (
+                            !empty($membership["membership_started_at"])
+                        ): ?>
+
+                            <p>
+                                <strong>Member Since:</strong>
+
+                                <?php echo htmlspecialchars(
+                                    date(
+                                        "F j, Y",
+                                        strtotime(
+                                            $membership["membership_started_at"]
+                                        )
+                                    ),
+                                    ENT_QUOTES,
+                                    "UTF-8"
+                                ); ?>
+                            </p>
+
+                        <?php endif; ?>
+
+
+                        <a
+                            href="../html/membership.php"
+                            class="dashboard-button"
+                        >
+                            View Membership Plans
+                        </a>
+
+                    <?php else: ?>
+
+                        <p class="dashboard-empty">
+                            You do not currently have an active membership.
+                        </p>
+
+                        <a
+                            href="../html/membership.php"
+                            class="dashboard-button"
+                        >
+                            View Membership Plans
+                        </a>
+
+                    <?php endif; ?>
+
+                </div>
+
+
+                <div class="dashboard-section">
+
                     <h3>Quick Actions</h3>
 
                     <div class="dashboard-actions">
@@ -340,6 +445,13 @@ $appointments = $stmt->fetchAll();
                             class="dashboard-action-link"
                         >
                             View Services
+                        </a>
+
+                        <a
+                            href="../html/membership.php"
+                            class="dashboard-action-link"
+                        >
+                            View Memberships
                         </a>
 
                         <a
