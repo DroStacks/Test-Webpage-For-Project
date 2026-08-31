@@ -7,8 +7,30 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
+require_once "/etc/healthbridge/db.php";
+
+$userId = $_SESSION["user_id"];
 $firstName = $_SESSION["first_name"];
 $email = $_SESSION["email"] ?? "";
+
+// Get this user's upcoming appointments
+$stmt = $pdo->prepare(
+    "SELECT
+        id,
+        appointment_date,
+        appointment_time,
+        service,
+        reason,
+        status
+     FROM appointments
+     WHERE user_id = ?
+       AND appointment_date >= CURDATE()
+     ORDER BY appointment_date ASC, appointment_time ASC"
+);
+
+$stmt->execute([$userId]);
+
+$appointments = $stmt->fetchAll();
 
 ?>
 
@@ -58,6 +80,7 @@ $email = $_SESSION["email"] ?? "";
             </div>
         </div>
 
+
         <div class="main-header">
 
             <nav>
@@ -103,15 +126,123 @@ $email = $_SESSION["email"] ?? "";
             </div>
 
 
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "success"
+            ): ?>
+
+                <div class="dashboard-success">
+                    Your appointment request was submitted successfully.
+                </div>
+
+            <?php endif; ?>
+
+
             <div class="dashboard-grid">
 
                 <div class="dashboard-section">
 
                     <h3>Upcoming Appointments</h3>
 
-                    <p class="dashboard-empty">
-                        You currently have no upcoming appointments.
-                    </p>
+                    <?php if (count($appointments) > 0): ?>
+
+                        <div class="appointment-list">
+
+                            <?php foreach ($appointments as $appointment): ?>
+
+                                <?php
+
+                                $serviceNames = [
+                                    "primary-care" => "Primary Care",
+                                    "preventive-care" => "Preventive Care",
+                                    "family-medicine" => "Family Medicine"
+                                ];
+
+                                $serviceName =
+                                    $serviceNames[$appointment["service"]]
+                                    ?? $appointment["service"];
+
+                                $formattedDate = date(
+                                    "F j, Y",
+                                    strtotime($appointment["appointment_date"])
+                                );
+
+                                $formattedTime = date(
+                                    "g:i A",
+                                    strtotime($appointment["appointment_time"])
+                                );
+
+                                ?>
+
+                                <div class="appointment-item">
+
+                                    <div class="appointment-item-header">
+
+                                        <h4>
+                                            <?php echo htmlspecialchars(
+                                                $serviceName,
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ); ?>
+                                        </h4>
+
+                                        <span class="appointment-status">
+                                            <?php echo htmlspecialchars(
+                                                $appointment["status"],
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ); ?>
+                                        </span>
+
+                                    </div>
+
+
+                                    <p>
+                                        <strong>Date:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $formattedDate,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+
+                                    <p>
+                                        <strong>Time:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $formattedTime,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+
+                                    <p>
+                                        <strong>Reason:</strong>
+
+                                        <?php echo htmlspecialchars(
+                                            $appointment["reason"],
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ); ?>
+                                    </p>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php else: ?>
+
+                        <p class="dashboard-empty">
+                            You currently have no upcoming appointments.
+                        </p>
+
+                    <?php endif; ?>
+
 
                     <a
                         href="../html/appointment.php"
@@ -129,6 +260,7 @@ $email = $_SESSION["email"] ?? "";
 
                     <p>
                         <strong>Name:</strong>
+
                         <?php echo htmlspecialchars(
                             $firstName,
                             ENT_QUOTES,
@@ -138,6 +270,7 @@ $email = $_SESSION["email"] ?? "";
 
                     <p>
                         <strong>Email:</strong>
+
                         <?php echo htmlspecialchars(
                             $email,
                             ENT_QUOTES,
