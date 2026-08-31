@@ -2454,3 +2454,24 @@ img {
         padding: 20px;
     }
 }
+
+/* Membership terms / footer text visibility */
+
+.membership-disclaimer,
+.membership-disclaimer h3,
+.membership-disclaimer p {
+    color: #486581;
+}
+
+.membership-disclaimer h3 {
+    color: #102a43;
+}
+
+.footer-brand h2 {
+    color: #ffffff;
+}
+
+.footer-brand p,
+.footer-links a {
+    color: #ffffff;
+}
