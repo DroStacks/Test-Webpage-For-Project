@@ -11,7 +11,7 @@ session_start();
 
     <title>Memberships | HealthBridge Medical</title>
 
-   <link rel="stylesheet" href="../css/style.css?v=2">
+   <link rel="stylesheet" href="../css/style.css?v=3">
     <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
@@ -362,6 +362,10 @@ session_start();
 
 </footer>
 
+    <?php require_once "../php/chatbot-widget.php"; ?>
+
+<script src="../js/script.js?v=4"></script>
+    
 </body>
 
 </html>
