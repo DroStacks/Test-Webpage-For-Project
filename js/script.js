@@ -478,3 +478,176 @@ if (appointmentForm) {
     });
 
 }
+
+
+// =========================
+// HEALTHBRIDGE CHATBOT
+// =========================
+
+const chatbotToggle = document.getElementById("chatbotToggle");
+const chatbotWindow = document.getElementById("chatbotWindow");
+const chatbotClose = document.getElementById("chatbotClose");
+
+const chatbotForm = document.getElementById("chatbotForm");
+const chatbotInput = document.getElementById("chatbotInput");
+const chatbotMessages = document.getElementById("chatbotMessages");
+
+
+if (
+    chatbotToggle &&
+    chatbotWindow &&
+    chatbotClose &&
+    chatbotForm &&
+    chatbotInput &&
+    chatbotMessages
+) {
+
+    chatbotToggle.addEventListener("click", function () {
+
+        chatbotWindow.hidden = false;
+
+        chatbotInput.focus();
+
+    });
+
+
+    chatbotClose.addEventListener("click", function () {
+
+        chatbotWindow.hidden = true;
+
+    });
+
+
+    chatbotForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const message = chatbotInput.value.trim();
+
+        if (message === "") {
+            return;
+        }
+
+
+        addChatbotMessage(
+            message,
+            "user"
+        );
+
+
+        chatbotInput.value = "";
+        chatbotInput.disabled = true;
+
+
+        const thinkingMessage = addChatbotMessage(
+            "Thinking...",
+            "assistant"
+        );
+
+
+        try {
+
+            const response = await fetch(
+                "php/chatbot.php",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        message: message
+                    })
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            thinkingMessage.remove();
+
+
+            if (
+                !response.ok ||
+                data.success !== true
+            ) {
+
+                addChatbotMessage(
+                    data.message ||
+                    "The HealthBridge Assistant is temporarily unavailable.",
+                    "assistant"
+                );
+
+                return;
+            }
+
+
+            addChatbotMessage(
+                data.reply,
+                "assistant"
+            );
+
+        } catch (error) {
+
+            thinkingMessage.remove();
+
+            addChatbotMessage(
+                "The HealthBridge Assistant is temporarily unavailable.",
+                "assistant"
+            );
+
+        } finally {
+
+            chatbotInput.disabled = false;
+            chatbotInput.focus();
+
+        }
+
+    });
+
+}
+
+
+function addChatbotMessage(
+    message,
+    sender
+) {
+
+    const messageElement = document.createElement("div");
+
+    messageElement.classList.add(
+        "chatbot-message"
+    );
+
+
+    if (sender === "user") {
+
+        messageElement.classList.add(
+            "chatbot-message-user"
+        );
+
+    } else {
+
+        messageElement.classList.add(
+            "chatbot-message-assistant"
+        );
+
+    }
+
+
+    messageElement.textContent = message;
+
+    chatbotMessages.appendChild(
+        messageElement
+    );
+
+
+    chatbotMessages.scrollTop =
+        chatbotMessages.scrollHeight;
+
+
+    return messageElement;
+
+}
