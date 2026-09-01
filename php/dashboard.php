@@ -82,7 +82,7 @@ $appointmentHistory = $stmt->fetchAll();
 
     <title>Patient Dashboard | HealthBridge Medical</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=2">
+    <link rel="stylesheet" href="../css/style.css?v=3">
     <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
 </head>
 
@@ -659,6 +659,10 @@ $appointmentHistory = $stmt->fetchAll();
     </div>
 
 </footer>
+
+    <?php require_once "chatbot-widget.php"; ?>
+
+    <script src="../js/script.js?v=4"></script>
     
 </body>
 
