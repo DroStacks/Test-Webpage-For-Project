@@ -333,7 +333,7 @@ session_start();
     <?php require_once "php/chatbot-widget.php"; ?>
 
 
-    <script src="js/script.js?v=3"></script>
+    <script src="js/script.js?v=4"></script>
 
 </body>
 
