@@ -548,7 +548,7 @@ if (
         try {
 
             const response = await fetch(
-                "php/chatbot.php",
+                    "/php/chatbot.php",
                 {
                     method: "POST",
 
