@@ -637,7 +637,12 @@ function addChatbotMessage(
     }
 
 
-    messageElement.textContent = message;
+    message = message
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/^\s*-\s+/gm, "• ");
+
+messageElement.textContent = message;
 
     chatbotMessages.appendChild(
         messageElement
