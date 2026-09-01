@@ -57,7 +57,7 @@ $selectedPlan = $plans[$plan];
         Membership Checkout | HealthBridge Medical
     </title>
 
-   <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="../css/style.css?v=3">
 
     <link
         rel="icon"
@@ -530,6 +530,9 @@ $selectedPlan = $plans[$plan];
 
     </footer>
 
+    <?php require_once "../php/chatbot-widget.php"; ?>
+
+<script src="../js/script.js?v=4"></script>
 
 </body>
 
