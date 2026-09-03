@@ -12,7 +12,7 @@ HealthBridge Medical is a fictional organization created solely for educational 
 
 ## Hosting Environment
 
-The website is currently hosted on a locally managed Ubuntu Server virtual machine rather than a third-party cloud provider such as AWS or Microsoft Azure.
+The website is currently hosted on a locally managed Ubuntu Server virtual machine rather than a third-party cloud provider such as AWS or Microsoft Azure. The prmary purpose of this is to control costs and avoid uncessary costs on only services that matter.
 
 The local environment is designed to mimic many aspects of a cloud-hosted Linux web server. This allows me to gain hands-on experience with server configuration, networking, web hosting, security, databases, and application deployment while maintaining control over the entire environment.
 
