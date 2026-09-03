@@ -34,13 +34,21 @@ The project currently includes a functional Apache/PHP web environment and MySQL
 
 The server environment is also managed through Linux and SSH, allowing the project to provide experience beyond simply writing the website's frontend code.
 
+## DNS 
+
+The HealthBridge Medical website uses Cloudflare as its domain registrar and DNS provider. Cloudflare was chosen to provide hands-on experience with domain management, DNS configuration, and common web security technologies used in real-world production environments.
+
+Through Cloudflare, the project provides practical experience managing DNS records and understanding how a domain name is connected to the web server hosting the application. This includes configuring and maintaining records such as A, CNAME, and other DNS records required for the website to function correctly.
+
+Cloudflare also provides additional security and performance features that can be incorporated into the project, including HTTPS/SSL support, DNS security, traffic proxying, caching, and protection against certain types of malicious web traffic.
+
+Using a dedicated domain and DNS provider helps make the project more representative of a real-world website deployment. It provides experience not only with developing the website itself, but also with configuring the infrastructure required to make a web application securely accessible over the Internet.
+
 ## Planned Features
 
 Development is ongoing, with additional features and infrastructure improvements planned, including:
 
-* DNS configuration
-* HTTPS/SSL encryption
-* Website favicon and branding improvements
+
 * Additional security configuration
 * Custom AI-powered chatbot using the OpenAI API
 * Continued UI/UX improvements
