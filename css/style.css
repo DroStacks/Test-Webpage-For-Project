@@ -2648,3 +2648,487 @@ img {
     }
 
 }
+
+
+/* ========================================
+   PATIENT PROFILE PAGE
+======================================== */
+
+/* Main profile page container */
+
+.profile-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0 60px;
+}
+
+
+/* Back to dashboard link */
+
+.profile-back {
+    display: inline-block;
+    margin-bottom: 28px;
+
+    color: #0f4c5c;
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.profile-back:hover {
+    text-decoration: underline;
+}
+
+
+/* Profile page heading */
+
+.profile-header {
+    margin-bottom: 32px;
+}
+
+.profile-header h2 {
+    margin: 0 0 12px;
+
+    color: #102a43;
+    font-size: 36px;
+}
+
+.profile-header p {
+    margin: 0;
+
+    color: #486581;
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   PATIENT OVERVIEW
+======================================== */
+
+.profile-overview {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    margin-bottom: 30px;
+    padding: 30px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 14px rgba(16, 42, 67, 0.08);
+}
+
+
+/* Patient avatar */
+
+.profile-avatar {
+    width: 76px;
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background-color: #0f4c5c;
+    color: #ffffff;
+
+    border-radius: 50%;
+
+    font-size: 30px;
+    font-weight: bold;
+}
+
+
+/* Patient name and email */
+
+.profile-overview h3 {
+    margin: 0 0 8px;
+
+    color: #102a43;
+    font-size: 24px;
+}
+
+.profile-overview p {
+    margin: 0 0 12px;
+
+    color: #486581;
+    font-size: 15px;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* Account status badge */
+
+.profile-status {
+    display: inline-block;
+
+    padding: 6px 13px;
+
+    background-color: #e7f6ef;
+    color: #245c44;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   PROFILE CARD GRID
+======================================== */
+
+.profile-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+
+    align-items: stretch;
+}
+
+
+/* Individual profile cards */
+
+.profile-card {
+    min-width: 0;
+
+    padding: 30px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 14px;
+
+    box-shadow: 0 4px 14px rgba(16, 42, 67, 0.08);
+}
+
+.profile-card h3 {
+    margin: 0 0 12px;
+
+    color: #102a43;
+    font-size: 22px;
+}
+
+
+/* Card description */
+
+.profile-description {
+    margin: 0 0 25px;
+
+    color: #486581;
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* Full-width profile card */
+
+.profile-full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ========================================
+   PROFILE FORM FIELDS
+======================================== */
+
+.profile-field {
+    margin-bottom: 20px;
+}
+
+.profile-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #334e68;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* Profile input fields */
+
+.profile-field input,
+.profile-field select,
+.profile-field textarea {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+
+    padding: 13px 14px;
+
+    background-color: #ffffff;
+    color: #102a43;
+
+    border: 1.5px solid #bcccdc;
+    border-radius: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+
+    transition: border-color 0.2s ease;
+}
+
+
+/* Input focus appearance */
+
+.profile-field input:focus,
+.profile-field select:focus,
+.profile-field textarea:focus {
+    outline: none;
+
+    border-color: #0f4c5c;
+
+    box-shadow: 0 0 0 3px rgba(15, 76, 92, 0.08);
+}
+
+
+/* Disabled fields */
+
+.profile-field input:disabled,
+.profile-field select:disabled,
+.profile-field textarea:disabled {
+    background-color: #f3f6f8;
+    color: #486581;
+
+    border-color: #d9e2ec;
+
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+
+/* Placeholder text */
+
+.profile-field input::placeholder,
+.profile-field textarea::placeholder {
+    color: #829ab1;
+}
+
+
+/* Two-column fields */
+
+.profile-row {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+/* ========================================
+   PROFILE BUTTONS
+======================================== */
+
+.profile-button {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    background-color: #0f4c5c;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+
+    text-align: center;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.profile-button:hover {
+    background-color: #0b3b47;
+    color: #ffffff;
+}
+
+
+/* Disabled buttons */
+
+.profile-button:disabled {
+    background-color: #a9b8c2;
+    color: #ffffff;
+
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   PROFILE NOTICES
+======================================== */
+
+.profile-notice {
+    margin: 20px 0;
+
+    padding: 15px 17px;
+
+    background-color: #e9f5f9;
+    color: #334e68;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   MEDICAL RECORDS AND SECURITY
+======================================== */
+
+.profile-record {
+    padding: 17px 0;
+
+    border-bottom: 1px solid #d9e2ec;
+}
+
+.profile-record:first-of-type {
+    padding-top: 0;
+}
+
+.profile-record:last-of-type {
+    border-bottom: none;
+}
+
+.profile-record h4 {
+    margin: 0 0 8px;
+
+    color: #0f4c5c;
+    font-size: 16px;
+}
+
+.profile-record p {
+    margin: 0;
+
+    color: #486581;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   PATIENT PROFILE - TABLET
+======================================== */
+
+@media (max-width: 900px) {
+
+    .profile-page {
+        padding: 10px 0 45px;
+    }
+
+    .profile-grid {
+        gap: 20px;
+    }
+
+    .profile-card {
+        padding: 24px;
+    }
+
+    .profile-header h2 {
+        font-size: 32px;
+    }
+
+}
+
+
+/* ========================================
+   PATIENT PROFILE - MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-full-width {
+        grid-column: auto;
+    }
+
+    .profile-overview {
+        padding: 24px;
+    }
+
+    .profile-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .profile-page {
+        padding: 5px 0 35px;
+    }
+
+    .profile-header {
+        margin-bottom: 25px;
+    }
+
+    .profile-header h2 {
+        font-size: 29px;
+    }
+
+    .profile-header p {
+        font-size: 15px;
+    }
+
+    .profile-overview {
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .profile-avatar {
+        width: 58px;
+        height: 58px;
+
+        font-size: 24px;
+    }
+
+    .profile-overview h3 {
+        font-size: 20px;
+    }
+
+    .profile-overview p {
+        font-size: 14px;
+    }
+
+    .profile-card {
+        padding: 22px;
+    }
+
+    .profile-card h3 {
+        font-size: 20px;
+    }
+
+    .profile-button {
+        width: 100%;
+    }
+
+}
