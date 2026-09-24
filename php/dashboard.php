@@ -1,3 +1,4 @@
+
 <?php
 
 session_start();
@@ -204,6 +205,8 @@ $appointmentHistory = $stmt->fetchAll();
 
             <div class="dashboard-grid">
 
+                <!-- UPCOMING APPOINTMENTS -->
+
                 <div class="dashboard-section">
 
                     <h3>Upcoming Appointments</h3>
@@ -343,8 +346,10 @@ $appointmentHistory = $stmt->fetchAll();
                         Schedule an Appointment
                     </a>
 
-                                </div>
+                </div>
 
+
+                <!-- APPOINTMENT HISTORY -->
 
                 <div class="dashboard-section">
 
@@ -449,9 +454,11 @@ $appointmentHistory = $stmt->fetchAll();
                 </div>
 
 
+                <!-- PATIENT PROFILE -->
+
                 <div class="dashboard-section">
 
-                    <h3>Account Information</h3>
+                    <h3>Patient Profile</h3>
 
                     <p>
                         <strong>Name:</strong>
@@ -473,8 +480,22 @@ $appointmentHistory = $stmt->fetchAll();
                         ); ?>
                     </p>
 
+                    <p>
+                        Manage your personal information, billing details,
+                        address, and medical records.
+                    </p>
+
+                    <a
+                        href="patient-profile.php"
+                        class="dashboard-button"
+                    >
+                        Manage Profile
+                    </a>
+
                 </div>
 
+
+                <!-- MEMBERSHIP -->
 
                 <div class="dashboard-section">
 
@@ -553,117 +574,61 @@ $appointmentHistory = $stmt->fetchAll();
 
                 </div>
 
-
-                <div class="dashboard-section">
-
-                    <h3>Quick Actions</h3>
-
-                    <div class="dashboard-actions">
-
-                        <a
-                            href="../html/appointment.php"
-                            class="dashboard-action-link"
-                        >
-                            Book Appointment
-                        </a>
-
-                        <a
-                            href="../html/services.php"
-                            class="dashboard-action-link"
-                        >
-                            View Services
-                        </a>
-
-                        <a
-                            href="../html/membership.php"
-                            class="dashboard-action-link"
-                        >
-                            View Memberships
-                        </a>
-
-                        <a
-                            href="../html/contact.php"
-                            class="dashboard-action-link"
-                        >
-                            Contact Support
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="dashboard-section">
-
-                    <h3>Patient Account</h3>
-
-                    <p>
-                        Securely access your HealthBridge Medical
-                        patient portal.
-                    </p>
-
-                    <a
-                        href="logout.php"
-                        class="dashboard-button dashboard-logout"
-                    >
-                        Logout
-                    </a>
-
-                </div>
-
             </div>
 
         </section>
 
     </main>
-      <footer>
 
-    <div class="footer-main">
 
-        <div class="footer-content">
+    <footer>
 
-            <div class="footer-brand">
+        <div class="footer-main">
 
-                <h2>HealthBridge Medical</h2>
+            <div class="footer-content">
 
-                <p>
-                    Connecting patients with convenient and accessible
-                    healthcare services.
-                </p>
+                <div class="footer-brand">
 
-            </div>
+                    <h2>HealthBridge Medical</h2>
 
-            <div class="footer-links">
+                    <p>
+                        Connecting patients with convenient and accessible
+                        healthcare services.
+                    </p>
 
-                <a href="../html/about.php">About</a>
-                <a href="../html/contact.php">Contact</a>
-                <a href="../html/membership.php">Memberships</a>
-                <a href="../html/privacy.php">Privacy Policy</a>
-                <a href="../html/terms.php">Terms and Conditions</a>
-                <a href="../html/accessibility.php">Accessibility</a>
+                </div>
+
+                <div class="footer-links">
+
+                    <a href="../html/about.php">About</a>
+                    <a href="../html/contact.php">Contact</a>
+                    <a href="../html/membership.php">Memberships</a>
+                    <a href="../html/privacy.php">Privacy Policy</a>
+                    <a href="../html/terms.php">Terms and Conditions</a>
+                    <a href="../html/accessibility.php">Accessibility</a>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        <div class="footer-bottom">
 
-    <div class="footer-bottom">
+            <p>
+                © 2026 HealthBridge Medical. This website is a mock
+                educational project and does not provide real medical
+                services.
+            </p>
 
-        <p>
-            © 2026 HealthBridge Medical. This website is a mock
-            educational project and does not provide real medical
-            services.
-        </p>
+        </div>
 
-    </div>
-
-</footer>
+    </footer>
 
     <?php require_once "chatbot-widget.php"; ?>
 
     <script src="../js/script.js?v=4"></script>
-    
+
 </body>
 
 </html>
