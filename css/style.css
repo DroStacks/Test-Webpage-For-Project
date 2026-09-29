@@ -3215,3 +3215,70 @@ img {
 [hidden] {
     display: none !important;
 }
+
+/* ========================================
+   BILLING AND MEDICAL RECORDS
+======================================== */
+
+.medical-record-list {
+    margin-bottom: 22px;
+}
+
+.medical-record-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 8px;
+}
+
+.medical-record-type {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    background-color: #e9f5f9;
+    color: #0f4c5c;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.medical-record-date {
+    color: #627d98;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.medical-record-actions {
+    margin-top: 20px;
+}
+
+.medical-record-form {
+    margin-top: 24px;
+    padding-top: 24px;
+
+    border-top: 1px solid #d9e2ec;
+}
+
+.medical-record-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+
+    .medical-record-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
