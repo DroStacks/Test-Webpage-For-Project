@@ -544,6 +544,264 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         // --------------------------------------------------
+        // UPDATE MEDICAL RECORD
+        // --------------------------------------------------
+
+        elseif ($action === "update_medical_record") {
+
+            $recordId =
+                filter_input(
+                    INPUT_POST,
+                    "record_id",
+                    FILTER_VALIDATE_INT
+                );
+
+            $recordType =
+                trim($_POST["record_type"] ?? "");
+
+            $recordTitle =
+                trim($_POST["record_title"] ?? "");
+
+            $recordDate =
+                trim($_POST["record_date"] ?? "");
+
+            $recordDetails =
+                trim($_POST["record_details"] ?? "");
+
+            $allowedRecordTypes = [
+                "Medical History",
+                "Medication",
+                "Allergy",
+                "Test Result",
+                "Visit Summary"
+            ];
+
+            if (!$recordId) {
+
+                $profileError =
+                    "The medical record could not be identified.";
+
+            } elseif (
+                !in_array(
+                    $recordType,
+                    $allowedRecordTypes,
+                    true
+                )
+            ) {
+
+                $profileError =
+                    "Please select a valid medical record type.";
+
+            } elseif ($recordTitle === "") {
+
+                $profileError =
+                    "Medical record title is required.";
+
+            } elseif (strlen($recordTitle) > 150) {
+
+                $profileError =
+                    "Medical record title must be 150 characters or fewer.";
+
+            } elseif ($recordDetails === "") {
+
+                $profileError =
+                    "Medical record details are required.";
+
+            } else {
+
+                // Validate optional record date
+                if ($recordDate !== "") {
+
+                    $date =
+                        DateTime::createFromFormat(
+                            "Y-m-d",
+                            $recordDate
+                        );
+
+                    $dateErrors =
+                        DateTime::getLastErrors();
+
+                    $dateIsValid =
+                        $date !== false &&
+                        (
+                            $dateErrors === false ||
+                            (
+                                $dateErrors["warning_count"] === 0 &&
+                                $dateErrors["error_count"] === 0
+                            )
+                        ) &&
+                        $date->format("Y-m-d") ===
+                            $recordDate;
+
+                    if (!$dateIsValid) {
+
+                        $profileError =
+                            "Please enter a valid medical record date.";
+
+                    }
+
+                }
+
+                if ($profileError === "") {
+
+                    try {
+
+                        /*
+                         * IMPORTANT:
+                         * We require BOTH the record ID and
+                         * logged-in user ID.
+                         *
+                         * This prevents one patient from
+                         * editing another patient's record.
+                         */
+
+                        $updateRecordStmt =
+                            $pdo->prepare(
+                                "UPDATE medical_records
+                                 SET
+                                    record_type = ?,
+                                    title = ?,
+                                    record_details = ?,
+                                    record_date = ?
+                                 WHERE id = ?
+                                 AND user_id = ?"
+                            );
+
+                        $updateRecordStmt->execute([
+                            $recordType,
+                            $recordTitle,
+                            $recordDetails,
+                            $recordDate !== ""
+                                ? $recordDate
+                                : null,
+                            $recordId,
+                            $userId
+                        ]);
+
+                        if (
+                            $updateRecordStmt->rowCount() === 0
+                        ) {
+
+                            /*
+                             * rowCount() can also be zero if
+                             * identical values were submitted.
+                             * Verify ownership/existence before
+                             * deciding that the record is missing.
+                             */
+
+                            $verifyRecordStmt =
+                                $pdo->prepare(
+                                    "SELECT id
+                                     FROM medical_records
+                                     WHERE id = ?
+                                     AND user_id = ?"
+                                );
+
+                            $verifyRecordStmt->execute([
+                                $recordId,
+                                $userId
+                            ]);
+
+                            if (!$verifyRecordStmt->fetch()) {
+
+                                $profileError =
+                                    "The medical record could not be found.";
+
+                            }
+
+                        }
+
+                        if ($profileError === "") {
+
+                            header(
+                                "Location: patient-profile.php?record_updated=1"
+                            );
+                            exit;
+
+                        }
+
+                    } catch (PDOException $e) {
+
+                        $profileError =
+                            "We could not update the medical record at this time. Please try again.";
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        // --------------------------------------------------
+        // DELETE MEDICAL RECORD
+        // --------------------------------------------------
+
+        elseif ($action === "delete_medical_record") {
+
+            $recordId =
+                filter_input(
+                    INPUT_POST,
+                    "record_id",
+                    FILTER_VALIDATE_INT
+                );
+
+            if (!$recordId) {
+
+                $profileError =
+                    "The medical record could not be identified.";
+
+            } else {
+
+                try {
+
+                    /*
+                     * Again, require BOTH ID and user_id.
+                     * A record belonging to another patient
+                     * cannot be deleted.
+                     */
+
+                    $deleteRecordStmt =
+                        $pdo->prepare(
+                            "DELETE FROM medical_records
+                             WHERE id = ?
+                             AND user_id = ?"
+                        );
+
+                    $deleteRecordStmt->execute([
+                        $recordId,
+                        $userId
+                    ]);
+
+                    if (
+                        $deleteRecordStmt->rowCount() !== 1
+                    ) {
+
+                        $profileError =
+                            "The medical record could not be found or deleted.";
+
+                    } else {
+
+                        header(
+                            "Location: patient-profile.php?record_deleted=1"
+                        );
+                        exit;
+
+                    }
+
+                } catch (PDOException $e) {
+
+                    $profileError =
+                        "We could not delete the medical record at this time. Please try again.";
+
+                }
+
+            }
+
+        }
+
+            
+        // --------------------------------------------------
         // CHANGE PASSWORD
         // --------------------------------------------------
 
@@ -718,6 +976,27 @@ if (
         "Your medical record has been added successfully.";
 
 }
+
+if (
+    isset($_GET["record_updated"]) &&
+    $_GET["record_updated"] === "1"
+) {
+
+    $profileSuccess =
+        "Your medical record has been updated successfully.";
+
+}
+
+if (
+    isset($_GET["record_deleted"]) &&
+    $_GET["record_deleted"] === "1"
+) {
+
+    $profileSuccess =
+        "Your medical record has been deleted successfully.";
+
+}
+
 
 if (
     isset($_GET["password_updated"]) &&
@@ -1762,7 +2041,7 @@ function escapeHtml($value)
 
                 </div>
 
-                <!-- ==================================
+                               <!-- ==================================
                      MEDICAL RECORDS
                 =================================== -->
 
@@ -1773,7 +2052,7 @@ function escapeHtml($value)
                     </h3>
 
                     <p class="profile-description">
-                        Add and review medical history,
+                        Add, edit, and review medical history,
                         medications, allergies, test results,
                         and visit summaries.
                     </p>
@@ -1800,62 +2079,343 @@ function escapeHtml($value)
 
                             <?php foreach ($medicalRecords as $record): ?>
 
-                                <div class="profile-record">
+                                <div
+                                    class="profile-record"
+                                    id="medical-record-<?php
+                                    echo (int) $record["id"];
+                                    ?>"
+                                >
 
-                                    <div class="medical-record-heading">
+                                    <!-- DISPLAY MODE -->
 
-                                        <span class="medical-record-type">
+                                    <div
+                                        id="record-display-<?php
+                                        echo (int) $record["id"];
+                                        ?>"
+                                    >
 
-                                            <?php
-                                            echo escapeHtml(
-                                                $record["record_type"]
-                                            );
-                                            ?>
+                                        <div class="medical-record-heading">
 
-                                        </span>
-
-                                        <?php if (!empty($record["record_date"])): ?>
-
-                                            <span class="medical-record-date">
+                                            <span class="medical-record-type">
 
                                                 <?php
                                                 echo escapeHtml(
-                                                    date(
-                                                        "m/d/Y",
-                                                        strtotime(
-                                                            $record["record_date"]
-                                                        )
-                                                    )
+                                                    $record["record_type"]
                                                 );
                                                 ?>
 
                                             </span>
 
-                                        <?php endif; ?>
+                                            <?php
+                                            if (
+                                                !empty(
+                                                    $record["record_date"]
+                                                )
+                                            ):
+                                            ?>
+
+                                                <span class="medical-record-date">
+
+                                                    <?php
+                                                    echo escapeHtml(
+                                                        date(
+                                                            "m/d/Y",
+                                                            strtotime(
+                                                                $record[
+                                                                    "record_date"
+                                                                ]
+                                                            )
+                                                        )
+                                                    );
+                                                    ?>
+
+                                                </span>
+
+                                            <?php endif; ?>
+
+                                        </div>
+
+                                        <h4>
+
+                                            <?php
+                                            echo escapeHtml(
+                                                $record["title"]
+                                            );
+                                            ?>
+
+                                        </h4>
+
+                                        <p>
+
+                                            <?php
+                                            echo nl2br(
+                                                escapeHtml(
+                                                    $record[
+                                                        "record_details"
+                                                    ]
+                                                )
+                                            );
+                                            ?>
+
+                                        </p>
+
+                                        <div class="medical-record-controls">
+
+                                            <button
+                                                type="button"
+                                                class="profile-button medical-edit-button"
+                                                data-record-id="<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <form
+                                                method="POST"
+                                                action="patient-profile.php"
+                                                class="medical-delete-form"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="delete_medical_record"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="record_id"
+                                                    value="<?php
+                                                    echo (int) $record["id"];
+                                                    ?>"
+                                                >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="csrf_token"
+                                                    value="<?php
+                                                    echo escapeHtml(
+                                                        $csrfToken
+                                                    );
+                                                    ?>"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="medical-delete-button"
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </form>
+
+                                        </div>
 
                                     </div>
 
-                                    <h4>
+                                    <!-- EDIT MODE -->
 
-                                        <?php
-                                        echo escapeHtml(
-                                            $record["title"]
-                                        );
-                                        ?>
+                                    <form
+                                        method="POST"
+                                        action="patient-profile.php"
+                                        class="medical-record-edit-form"
+                                        id="record-edit-<?php
+                                        echo (int) $record["id"];
+                                        ?>"
+                                        hidden
+                                    >
 
-                                    </h4>
+                                        <input
+                                            type="hidden"
+                                            name="action"
+                                            value="update_medical_record"
+                                        >
 
-                                    <p>
+                                        <input
+                                            type="hidden"
+                                            name="record_id"
+                                            value="<?php
+                                            echo (int) $record["id"];
+                                            ?>"
+                                        >
 
-                                        <?php
-                                        echo nl2br(
-                                            escapeHtml(
-                                                $record["record_details"]
-                                            )
-                                        );
-                                        ?>
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="<?php
+                                            echo escapeHtml(
+                                                $csrfToken
+                                            );
+                                            ?>"
+                                        >
 
-                                    </p>
+                                        <div class="profile-field">
+
+                                            <label
+                                                for="edit-record-type-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Record Type
+                                            </label>
+
+                                            <select
+                                                id="edit-record-type-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                                name="record_type"
+                                                required
+                                            >
+
+                                                <?php
+
+                                                $recordTypes = [
+                                                    "Medical History",
+                                                    "Medication",
+                                                    "Allergy",
+                                                    "Test Result",
+                                                    "Visit Summary"
+                                                ];
+
+                                                foreach (
+                                                    $recordTypes
+                                                    as $type
+                                                ):
+
+                                                ?>
+
+                                                    <option
+                                                        value="<?php
+                                                        echo escapeHtml(
+                                                            $type
+                                                        );
+                                                        ?>"
+                                                        <?php
+                                                        echo
+                                                            $record[
+                                                                "record_type"
+                                                            ] === $type
+                                                                ? "selected"
+                                                                : "";
+                                                        ?>
+                                                    >
+                                                        <?php
+                                                        echo escapeHtml(
+                                                            $type
+                                                        );
+                                                        ?>
+                                                    </option>
+
+                                                <?php endforeach; ?>
+
+                                            </select>
+
+                                        </div>
+
+                                        <div class="profile-field">
+
+                                            <label
+                                                for="edit-record-title-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Title
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                id="edit-record-title-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                                name="record_title"
+                                                maxlength="150"
+                                                value="<?php
+                                                echo escapeHtml(
+                                                    $record["title"]
+                                                );
+                                                ?>"
+                                                required
+                                            >
+
+                                        </div>
+
+                                        <div class="profile-field">
+
+                                            <label
+                                                for="edit-record-date-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Record Date
+                                            </label>
+
+                                            <input
+                                                type="date"
+                                                id="edit-record-date-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                                name="record_date"
+                                                value="<?php
+                                                echo escapeHtml(
+                                                    $record[
+                                                        "record_date"
+                                                    ] ?? ""
+                                                );
+                                                ?>"
+                                            >
+
+                                        </div>
+
+                                        <div class="profile-field">
+
+                                            <label
+                                                for="edit-record-details-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Details
+                                            </label>
+
+                                            <textarea
+                                                id="edit-record-details-<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                                name="record_details"
+                                                rows="5"
+                                                required
+                                            ><?php
+                                            echo escapeHtml(
+                                                $record[
+                                                    "record_details"
+                                                ]
+                                            );
+                                            ?></textarea>
+
+                                        </div>
+
+                                        <div class="profile-edit-actions">
+
+                                            <button
+                                                type="submit"
+                                                class="profile-button"
+                                            >
+                                                Save Changes
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="profile-cancel-button medical-edit-cancel"
+                                                data-record-id="<?php
+                                                echo (int) $record["id"];
+                                                ?>"
+                                            >
+                                                Cancel
+                                            </button>
+
+                                        </div>
+
+                                    </form>
 
                                 </div>
 
@@ -1864,6 +2424,8 @@ function escapeHtml($value)
                         <?php endif; ?>
 
                     </div>
+
+                    <!-- ADD NEW RECORD -->
 
                     <div class="medical-record-actions">
 
@@ -2557,6 +3119,135 @@ function escapeHtml($value)
 
                 }
 
+                // ----------------------------------
+                // MEDICAL RECORD EDITING
+                // ----------------------------------
+
+                const medicalEditButtons =
+                    document.querySelectorAll(
+                        ".medical-edit-button"
+                    );
+
+                const medicalEditCancelButtons =
+                    document.querySelectorAll(
+                        ".medical-edit-cancel"
+                    );
+
+                medicalEditButtons.forEach(
+                    function (button) {
+
+                        button.addEventListener(
+                            "click",
+                            function () {
+
+                                const recordId =
+                                    button.dataset.recordId;
+
+                                const display =
+                                    document.getElementById(
+                                        "record-display-" +
+                                        recordId
+                                    );
+
+                                const editForm =
+                                    document.getElementById(
+                                        "record-edit-" +
+                                        recordId
+                                    );
+
+                                if (
+                                    display &&
+                                    editForm
+                                ) {
+
+                                    display.hidden =
+                                        true;
+
+                                    editForm.hidden =
+                                        false;
+
+                                }
+
+                            }
+                        );
+
+                    }
+                );
+
+                medicalEditCancelButtons.forEach(
+                    function (button) {
+
+                        button.addEventListener(
+                            "click",
+                            function () {
+
+                                const recordId =
+                                    button.dataset.recordId;
+
+                                const display =
+                                    document.getElementById(
+                                        "record-display-" +
+                                        recordId
+                                    );
+
+                                const editForm =
+                                    document.getElementById(
+                                        "record-edit-" +
+                                        recordId
+                                    );
+
+                                if (
+                                    display &&
+                                    editForm
+                                ) {
+
+                                    editForm.hidden =
+                                        true;
+
+                                    display.hidden =
+                                        false;
+
+                                }
+
+                            }
+                        );
+
+                    }
+                );
+
+                // ----------------------------------
+                // MEDICAL RECORD DELETE CONFIRMATION
+                // ----------------------------------
+
+                const medicalDeleteForms =
+                    document.querySelectorAll(
+                        ".medical-delete-form"
+                    );
+
+                medicalDeleteForms.forEach(
+                    function (form) {
+
+                        form.addEventListener(
+                            "submit",
+                            function (event) {
+
+                                const confirmed =
+                                    window.confirm(
+                                        "Are you sure you want to delete this medical record? This action cannot be undone."
+                                    );
+
+                                if (!confirmed) {
+                                    event.preventDefault();
+                                }
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                
             }
         );
 
