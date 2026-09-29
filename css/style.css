@@ -3325,3 +3325,68 @@ img {
 
     border-color: #0f4c5c;
 }
+
+
+/* ========================================
+   MEDICAL RECORD EDIT / DELETE
+======================================== */
+
+.medical-record-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 16px;
+}
+
+.medical-delete-form {
+    margin: 0;
+}
+
+.medical-delete-button {
+    padding: 11px 18px;
+
+    background-color: #ffffff;
+    color: #b42318;
+
+    border: 1.5px solid #b42318;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.medical-delete-button:hover {
+    background-color: #b42318;
+    color: #ffffff;
+}
+
+.medical-record-edit-form {
+    padding-top: 8px;
+}
+
+.medical-record-edit-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+@media (max-width: 600px) {
+
+    .medical-record-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .medical-record-controls .profile-button,
+    .medical-delete-button {
+        width: 100%;
+    }
+
+}
