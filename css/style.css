@@ -3282,3 +3282,46 @@ img {
     }
 
 }
+
+/* ========================================
+   ACCOUNT SECURITY
+======================================== */
+
+.password-change-form {
+    margin-top: 24px;
+    padding-top: 24px;
+
+    border-top: 1px solid #d9e2ec;
+}
+
+.account-security-logout {
+    margin-top: 24px;
+}
+
+.profile-field select {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #bcccdc;
+    border-radius: 7px;
+
+    background-color: #ffffff;
+    color: #102a43;
+
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.profile-field select:disabled {
+    background-color: #f0f4f8;
+    color: #627d98;
+
+    cursor: not-allowed;
+}
+
+.profile-field select:focus {
+    outline: none;
+
+    border-color: #0f4c5c;
+}
