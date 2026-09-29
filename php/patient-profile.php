@@ -204,16 +204,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $profileError =
                     "Street address, city, state, and ZIP code are required.";
 
-            } elseif (
-                strlen($streetAddress) > 150
-            ) {
+            } elseif (strlen($streetAddress) > 150) {
 
                 $profileError =
                     "Street address must be 150 characters or fewer.";
 
-            } elseif (
-                strlen($apartmentSuite) > 50
-            ) {
+            } elseif (strlen($apartmentSuite) > 50) {
 
                 $profileError =
                     "Apartment or suite must be 50 characters or fewer.";
@@ -300,51 +296,65 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $billingAddress =
                 trim($_POST["billing_address"] ?? "");
 
-            $paymentMethod =
-                trim($_POST["payment_method"] ?? "");
+            $cardType =
+                trim($_POST["card_type"] ?? "");
 
-            if (
-                strlen($insuranceProvider) > 100
-            ) {
+            $cardLastFour =
+                trim($_POST["card_last_four"] ?? "");
+
+            $allowedCardTypes = [
+                "",
+                "Visa",
+                "Mastercard",
+                "American Express",
+                "Discover"
+            ];
+
+            if (strlen($insuranceProvider) > 100) {
 
                 $profileError =
                     "Insurance provider must be 100 characters or fewer.";
 
-            } elseif (
-                strlen($policyNumber) > 100
-            ) {
+            } elseif (strlen($policyNumber) > 100) {
 
                 $profileError =
                     "Policy number must be 100 characters or fewer.";
 
-            } elseif (
-                strlen($billingAddress) > 255
-            ) {
+            } elseif (strlen($billingAddress) > 255) {
 
                 $profileError =
                     "Billing address must be 255 characters or fewer.";
 
             } elseif (
-                strlen($paymentMethod) > 100
+                !in_array(
+                    $cardType,
+                    $allowedCardTypes,
+                    true
+                )
             ) {
 
                 $profileError =
-                    "Payment method description must be 100 characters or fewer.";
+                    "Please select a valid card type.";
+
+            } elseif (
+                $cardLastFour !== "" &&
+                !preg_match('/^\d{4}$/', $cardLastFour)
+            ) {
+
+                $profileError =
+                    "The card last four must contain exactly four digits.";
+
+            } elseif (
+                ($cardType === "" && $cardLastFour !== "") ||
+                ($cardType !== "" && $cardLastFour === "")
+            ) {
+
+                $profileError =
+                    "Please provide both the card type and last four digits.";
 
             } else {
 
                 try {
-
-                    /*
-                     * One billing record per patient.
-                     *
-                     * If the patient does not have one yet,
-                     * INSERT creates it.
-                     *
-                     * If one already exists, the UNIQUE
-                     * user_id causes the existing row to
-                     * be updated.
-                     */
 
                     $billingStmt = $pdo->prepare(
                         "INSERT INTO patient_billing (
@@ -352,9 +362,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             insurance_provider,
                             policy_number,
                             billing_address,
-                            payment_method
+                            card_type,
+                            card_last_four
                          )
-                         VALUES (?, ?, ?, ?, ?)
+                         VALUES (?, ?, ?, ?, ?, ?)
                          ON DUPLICATE KEY UPDATE
                             insurance_provider =
                                 VALUES(insurance_provider),
@@ -362,8 +373,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 VALUES(policy_number),
                             billing_address =
                                 VALUES(billing_address),
-                            payment_method =
-                                VALUES(payment_method)"
+                            card_type =
+                                VALUES(card_type),
+                            card_last_four =
+                                VALUES(card_last_four)"
                     );
 
                     $billingStmt->execute([
@@ -377,8 +390,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $billingAddress !== ""
                             ? $billingAddress
                             : null,
-                        $paymentMethod !== ""
-                            ? $paymentMethod
+                        $cardType !== ""
+                            ? $cardType
+                            : null,
+                        $cardLastFour !== ""
+                            ? $cardLastFour
                             : null
                     ]);
 
@@ -440,9 +456,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $profileError =
                     "Medical record title is required.";
 
-            } elseif (
-                strlen($recordTitle) > 150
-            ) {
+            } elseif (strlen($recordTitle) > 150) {
 
                 $profileError =
                     "Medical record title must be 150 characters or fewer.";
@@ -454,7 +468,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             } else {
 
-                // Validate optional record date
                 if ($recordDate !== "") {
 
                     $date =
@@ -530,6 +543,134 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+        // --------------------------------------------------
+        // CHANGE PASSWORD
+        // --------------------------------------------------
+
+        elseif ($action === "change_password") {
+
+            $currentPassword =
+                $_POST["current_password"] ?? "";
+
+            $newPassword =
+                $_POST["new_password"] ?? "";
+
+            $confirmPassword =
+                $_POST["confirm_password"] ?? "";
+
+            if (
+                $currentPassword === "" ||
+                $newPassword === "" ||
+                $confirmPassword === ""
+            ) {
+
+                $profileError =
+                    "All password fields are required.";
+
+            } elseif (strlen($newPassword) < 8) {
+
+                $profileError =
+                    "Your new password must be at least 8 characters long.";
+
+            } elseif (strlen($newPassword) > 255) {
+
+                $profileError =
+                    "Your new password is too long.";
+
+            } elseif ($newPassword !== $confirmPassword) {
+
+                $profileError =
+                    "The new password and confirmation do not match.";
+
+            } else {
+
+                try {
+
+                    // Retrieve current password hash
+                    $passwordStmt = $pdo->prepare(
+                        "SELECT password_hash
+                         FROM users
+                         WHERE id = ?"
+                    );
+
+                    $passwordStmt->execute([$userId]);
+
+                    $passwordUser =
+                        $passwordStmt->fetch(
+                            PDO::FETCH_ASSOC
+                        );
+
+                    if (!$passwordUser) {
+
+                        $profileError =
+                            "Your account could not be found.";
+
+                    } elseif (
+                        !password_verify(
+                            $currentPassword,
+                            $passwordUser["password_hash"]
+                        )
+                    ) {
+
+                        $profileError =
+                            "Your current password is incorrect.";
+
+                    } elseif (
+                        password_verify(
+                            $newPassword,
+                            $passwordUser["password_hash"]
+                        )
+                    ) {
+
+                        $profileError =
+                            "Your new password must be different from your current password.";
+
+                    } else {
+
+                        $newPasswordHash =
+                            password_hash(
+                                $newPassword,
+                                PASSWORD_DEFAULT
+                            );
+
+                        $passwordUpdateStmt =
+                            $pdo->prepare(
+                                "UPDATE users
+                                 SET password_hash = ?
+                                 WHERE id = ?"
+                            );
+
+                        $passwordUpdateStmt->execute([
+                            $newPasswordHash,
+                            $userId
+                        ]);
+
+                        // Rotate session ID after
+                        // security-sensitive change.
+                        session_regenerate_id(true);
+
+                        // Rotate CSRF token as well.
+                        $_SESSION["profile_csrf_token"] =
+                            bin2hex(random_bytes(32));
+
+                        header(
+                            "Location: patient-profile.php?password_updated=1"
+                        );
+                        exit;
+
+                    }
+
+                } catch (PDOException $e) {
+
+                    $profileError =
+                        "We could not update your password at this time. Please try again.";
+
+                }
+
+            }
+
+        }
+
     }
 
 }
@@ -578,6 +719,16 @@ if (
 
 }
 
+if (
+    isset($_GET["password_updated"]) &&
+    $_GET["password_updated"] === "1"
+) {
+
+    $profileSuccess =
+        "Your password has been changed successfully.";
+
+}
+
 // --------------------------------------------------
 // RETRIEVE PATIENT INFORMATION
 // --------------------------------------------------
@@ -603,7 +754,8 @@ $stmt = $pdo->prepare(
 
 $stmt->execute([$userId]);
 
-$patient = $stmt->fetch(PDO::FETCH_ASSOC);
+$patient =
+    $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$patient) {
     header("Location: logout.php");
@@ -611,6 +763,7 @@ if (!$patient) {
 }
 
 // Personal information
+
 $firstName =
     $patient["first_name"];
 
@@ -630,6 +783,7 @@ $emergencyContact =
     $patient["emergency_contact"] ?? "";
 
 // Address information
+
 $streetAddress =
     $patient["street_address"] ?? "";
 
@@ -657,7 +811,8 @@ $billingStmt = $pdo->prepare(
         insurance_provider,
         policy_number,
         billing_address,
-        payment_method
+        card_type,
+        card_last_four
      FROM patient_billing
      WHERE user_id = ?"
 );
@@ -676,8 +831,11 @@ $policyNumber =
 $billingAddress =
     $billing["billing_address"] ?? "";
 
-$paymentMethod =
-    $billing["payment_method"] ?? "";
+$cardType =
+    $billing["card_type"] ?? "";
+
+$cardLastFour =
+    $billing["card_last_four"] ?? "";
 
 // --------------------------------------------------
 // RETRIEVE MEDICAL RECORDS
@@ -694,17 +852,22 @@ $medicalStmt = $pdo->prepare(
      FROM medical_records
      WHERE user_id = ?
      ORDER BY
-        COALESCE(record_date, DATE(created_at)) DESC,
+        COALESCE(
+            record_date,
+            DATE(created_at)
+        ) DESC,
         created_at DESC"
 );
 
 $medicalStmt->execute([$userId]);
 
 $medicalRecords =
-    $medicalStmt->fetchAll(PDO::FETCH_ASSOC);
+    $medicalStmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
 
 // --------------------------------------------------
-// HELPER FUNCTION
+// HELPER
 // --------------------------------------------------
 
 function escapeHtml($value)
@@ -719,6 +882,7 @@ function escapeHtml($value)
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -734,11 +898,9 @@ function escapeHtml($value)
         Patient Profile | HealthBridge Medical
     </title>
 
-    <!-- MASTER CSS -->
-
     <link
         rel="stylesheet"
-        href="../css/style.css?v=7"
+        href="../css/style.css?v=8"
     >
 
     <link
@@ -800,7 +962,11 @@ function escapeHtml($value)
             <nav>
 
                 <div class="logo">
-                    <h1>HealthBridge Medical</h1>
+
+                    <h1>
+                        HealthBridge Medical
+                    </h1>
+
                 </div>
 
                 <ul class="nav-links">
@@ -860,37 +1026,40 @@ function escapeHtml($value)
 
             <div class="profile-header">
 
-                <h2>My Patient Profile</h2>
+                <h2>
+                    My Patient Profile
+                </h2>
 
                 <p>
                     Manage your personal information,
-                    billing details, and medical records.
+                    billing details, medical records,
+                    and account security.
                 </p>
 
             </div>
-
-            <!-- SUCCESS -->
 
             <?php if ($profileSuccess !== ""): ?>
 
                 <div class="profile-success">
 
                     <?php
-                    echo escapeHtml($profileSuccess);
+                    echo escapeHtml(
+                        $profileSuccess
+                    );
                     ?>
 
                 </div>
 
             <?php endif; ?>
 
-            <!-- ERROR -->
-
             <?php if ($profileError !== ""): ?>
 
                 <div class="profile-error">
 
                     <?php
-                    echo escapeHtml($profileError);
+                    echo escapeHtml(
+                        $profileError
+                    );
                     ?>
 
                 </div>
@@ -906,7 +1075,11 @@ function escapeHtml($value)
                     <?php
                     echo escapeHtml(
                         strtoupper(
-                            substr($firstName, 0, 1)
+                            substr(
+                                $firstName,
+                                0,
+                                1
+                            )
                         )
                     );
                     ?>
@@ -916,11 +1089,19 @@ function escapeHtml($value)
                 <div>
 
                     <h3>
-                        <?php echo escapeHtml($fullName); ?>
+                        <?php
+                        echo escapeHtml(
+                            $fullName
+                        );
+                        ?>
                     </h3>
 
                     <p>
-                        <?php echo escapeHtml($email); ?>
+                        <?php
+                        echo escapeHtml(
+                            $email
+                        );
+                        ?>
                     </p>
 
                     <span class="profile-status">
@@ -939,7 +1120,9 @@ function escapeHtml($value)
 
                 <div class="profile-card">
 
-                    <h3>Personal Information</h3>
+                    <h3>
+                        Personal Information
+                    </h3>
 
                     <p class="profile-description">
                         Manage your account details and
@@ -949,7 +1132,6 @@ function escapeHtml($value)
                     <form
                         method="POST"
                         action="patient-profile.php"
-                        id="personal-information-form"
                     >
 
                         <input
@@ -962,7 +1144,9 @@ function escapeHtml($value)
                             type="hidden"
                             name="csrf_token"
                             value="<?php
-                            echo escapeHtml($csrfToken);
+                            echo escapeHtml(
+                                $csrfToken
+                            );
                             ?>"
                         >
 
@@ -980,7 +1164,9 @@ function escapeHtml($value)
                                     name="first_name"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml($firstName);
+                                    echo escapeHtml(
+                                        $firstName
+                                    );
                                     ?>"
                                     required
                                     disabled
@@ -1000,7 +1186,9 @@ function escapeHtml($value)
                                     name="last_name"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml($lastName);
+                                    echo escapeHtml(
+                                        $lastName
+                                    );
                                     ?>"
                                     required
                                     disabled
@@ -1020,7 +1208,9 @@ function escapeHtml($value)
                                 type="email"
                                 id="profile-email"
                                 value="<?php
-                                echo escapeHtml($email);
+                                echo escapeHtml(
+                                    $email
+                                );
                                 ?>"
                                 disabled
                             >
@@ -1039,7 +1229,9 @@ function escapeHtml($value)
                                 name="phone"
                                 maxlength="25"
                                 value="<?php
-                                echo escapeHtml($phone);
+                                echo escapeHtml(
+                                    $phone
+                                );
                                 ?>"
                                 placeholder="Not provided"
                                 disabled
@@ -1058,7 +1250,9 @@ function escapeHtml($value)
                                 id="profile-dob"
                                 name="date_of_birth"
                                 value="<?php
-                                echo escapeHtml($dateOfBirth);
+                                echo escapeHtml(
+                                    $dateOfBirth
+                                );
                                 ?>"
                                 max="<?php
                                 echo date("Y-m-d");
@@ -1132,12 +1326,14 @@ function escapeHtml($value)
                 </div>
 
                 <!-- ==================================
-                     ADDRESS INFORMATION
+                     ADDRESS
                 =================================== -->
 
                 <div class="profile-card">
 
-                    <h3>Address Information</h3>
+                    <h3>
+                        Address Information
+                    </h3>
 
                     <p class="profile-description">
                         Manage your residential address
@@ -1147,7 +1343,6 @@ function escapeHtml($value)
                     <form
                         method="POST"
                         action="patient-profile.php"
-                        id="address-information-form"
                     >
 
                         <input
@@ -1160,7 +1355,9 @@ function escapeHtml($value)
                             type="hidden"
                             name="csrf_token"
                             value="<?php
-                            echo escapeHtml($csrfToken);
+                            echo escapeHtml(
+                                $csrfToken
+                            );
                             ?>"
                         >
 
@@ -1176,7 +1373,9 @@ function escapeHtml($value)
                                 name="street_address"
                                 maxlength="150"
                                 value="<?php
-                                echo escapeHtml($streetAddress);
+                                echo escapeHtml(
+                                    $streetAddress
+                                );
                                 ?>"
                                 placeholder="Not provided"
                                 required
@@ -1197,7 +1396,9 @@ function escapeHtml($value)
                                 name="apartment_suite"
                                 maxlength="50"
                                 value="<?php
-                                echo escapeHtml($apartmentSuite);
+                                echo escapeHtml(
+                                    $apartmentSuite
+                                );
                                 ?>"
                                 placeholder="Optional"
                                 disabled
@@ -1219,7 +1420,9 @@ function escapeHtml($value)
                                     name="city"
                                     maxlength="100"
                                     value="<?php
-                                    echo escapeHtml($city);
+                                    echo escapeHtml(
+                                        $city
+                                    );
                                     ?>"
                                     placeholder="Not provided"
                                     required
@@ -1240,7 +1443,9 @@ function escapeHtml($value)
                                     name="state"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml($state);
+                                    echo escapeHtml(
+                                        $state
+                                    );
                                     ?>"
                                     placeholder="Not provided"
                                     required
@@ -1263,7 +1468,9 @@ function escapeHtml($value)
                                 name="zip_code"
                                 maxlength="10"
                                 value="<?php
-                                echo escapeHtml($zipCode);
+                                echo escapeHtml(
+                                    $zipCode
+                                );
                                 ?>"
                                 placeholder="Not provided"
                                 required
@@ -1317,17 +1524,18 @@ function escapeHtml($value)
 
                 <div class="profile-card">
 
-                    <h3>Billing &amp; Insurance</h3>
+                    <h3>
+                        Billing &amp; Insurance
+                    </h3>
 
                     <p class="profile-description">
-                        Manage your insurance information,
-                        billing address, and payment details.
+                        Manage your insurance information
+                        and demonstration payment method.
                     </p>
 
                     <form
                         method="POST"
                         action="patient-profile.php"
-                        id="billing-information-form"
                     >
 
                         <input
@@ -1340,7 +1548,9 @@ function escapeHtml($value)
                             type="hidden"
                             name="csrf_token"
                             value="<?php
-                            echo escapeHtml($csrfToken);
+                            echo escapeHtml(
+                                $csrfToken
+                            );
                             ?>"
                         >
 
@@ -1390,9 +1600,7 @@ function escapeHtml($value)
 
                         <div class="profile-field">
 
-                            <label
-                                for="profile-billing-address"
-                            >
+                            <label for="profile-billing-address">
                                 Billing Address
                             </label>
 
@@ -1412,33 +1620,112 @@ function escapeHtml($value)
 
                         </div>
 
-                        <div class="profile-field">
+                        <div class="profile-row">
 
-                            <label for="profile-payment">
-                                Payment Method
-                            </label>
+                            <div class="profile-field">
 
-                            <input
-                                type="text"
-                                id="profile-payment"
-                                name="payment_method"
-                                maxlength="100"
-                                value="<?php
-                                echo escapeHtml(
-                                    $paymentMethod
-                                );
-                                ?>"
-                                placeholder="Example: Visa ending in 4242"
-                                disabled
-                            >
+                                <label for="profile-card-type">
+                                    Card Type
+                                </label>
+
+                                <select
+                                    id="profile-card-type"
+                                    name="card_type"
+                                    disabled
+                                >
+
+                                    <option
+                                        value=""
+                                        <?php
+                                        echo $cardType === ""
+                                            ? "selected"
+                                            : "";
+                                        ?>
+                                    >
+                                        No card on file
+                                    </option>
+
+                                    <option
+                                        value="Visa"
+                                        <?php
+                                        echo $cardType === "Visa"
+                                            ? "selected"
+                                            : "";
+                                        ?>
+                                    >
+                                        Visa
+                                    </option>
+
+                                    <option
+                                        value="Mastercard"
+                                        <?php
+                                        echo $cardType === "Mastercard"
+                                            ? "selected"
+                                            : "";
+                                        ?>
+                                    >
+                                        Mastercard
+                                    </option>
+
+                                    <option
+                                        value="American Express"
+                                        <?php
+                                        echo $cardType === "American Express"
+                                            ? "selected"
+                                            : "";
+                                        ?>
+                                    >
+                                        American Express
+                                    </option>
+
+                                    <option
+                                        value="Discover"
+                                        <?php
+                                        echo $cardType === "Discover"
+                                            ? "selected"
+                                            : "";
+                                        ?>
+                                    >
+                                        Discover
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="profile-field">
+
+                                <label for="profile-card-last-four">
+                                    Last Four Digits
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="profile-card-last-four"
+                                    name="card_last_four"
+                                    maxlength="4"
+                                    inputmode="numeric"
+                                    pattern="[0-9]{4}"
+                                    value="<?php
+                                    echo escapeHtml(
+                                        $cardLastFour
+                                    );
+                                    ?>"
+                                    placeholder="4242"
+                                    disabled
+                                >
+
+                            </div>
 
                         </div>
 
                         <div class="profile-notice">
-                            HealthBridge is an educational
-                            demonstration. Do not enter real
-                            payment-card, banking, or insurance
-                            information.
+                            HealthBridge stores only a
+                            demonstration card type and
+                            last four digits. Never enter
+                            a full card number, CVV,
+                            banking information, or real
+                            insurance information.
                         </div>
 
                         <div class="profile-edit-actions">
@@ -1481,15 +1768,15 @@ function escapeHtml($value)
 
                 <div class="profile-card">
 
-                    <h3>Medical Records</h3>
+                    <h3>
+                        Medical Records
+                    </h3>
 
                     <p class="profile-description">
                         Add and review medical history,
                         medications, allergies, test results,
                         and visit summaries.
                     </p>
-
-                    <!-- EXISTING RECORDS -->
 
                     <div class="medical-record-list">
 
@@ -1511,53 +1798,37 @@ function escapeHtml($value)
 
                         <?php else: ?>
 
-                            <?php
-                            foreach ($medicalRecords as $record):
-                            ?>
+                            <?php foreach ($medicalRecords as $record): ?>
 
                                 <div class="profile-record">
 
-                                    <div
-                                        class="medical-record-heading"
-                                    >
+                                    <div class="medical-record-heading">
 
-                                        <span
-                                            class="medical-record-type"
-                                        >
+                                        <span class="medical-record-type">
+
                                             <?php
                                             echo escapeHtml(
-                                                $record[
-                                                    "record_type"
-                                                ]
+                                                $record["record_type"]
                                             );
                                             ?>
+
                                         </span>
 
-                                        <?php
-                                        if (
-                                            !empty(
-                                                $record[
-                                                    "record_date"
-                                                ]
-                                            )
-                                        ):
-                                        ?>
+                                        <?php if (!empty($record["record_date"])): ?>
 
-                                            <span
-                                                class="medical-record-date"
-                                            >
+                                            <span class="medical-record-date">
+
                                                 <?php
                                                 echo escapeHtml(
                                                     date(
                                                         "m/d/Y",
                                                         strtotime(
-                                                            $record[
-                                                                "record_date"
-                                                            ]
+                                                            $record["record_date"]
                                                         )
                                                     )
                                                 );
                                                 ?>
+
                                             </span>
 
                                         <?php endif; ?>
@@ -1565,23 +1836,25 @@ function escapeHtml($value)
                                     </div>
 
                                     <h4>
+
                                         <?php
                                         echo escapeHtml(
                                             $record["title"]
                                         );
                                         ?>
+
                                     </h4>
 
                                     <p>
+
                                         <?php
                                         echo nl2br(
                                             escapeHtml(
-                                                $record[
-                                                    "record_details"
-                                                ]
+                                                $record["record_details"]
                                             )
                                         );
                                         ?>
+
                                     </p>
 
                                 </div>
@@ -1591,8 +1864,6 @@ function escapeHtml($value)
                         <?php endif; ?>
 
                     </div>
-
-                    <!-- ADD RECORD BUTTON -->
 
                     <div class="medical-record-actions">
 
@@ -1605,8 +1876,6 @@ function escapeHtml($value)
                         </button>
 
                     </div>
-
-                    <!-- ADD RECORD FORM -->
 
                     <form
                         method="POST"
@@ -1626,7 +1895,9 @@ function escapeHtml($value)
                             type="hidden"
                             name="csrf_token"
                             value="<?php
-                            echo escapeHtml($csrfToken);
+                            echo escapeHtml(
+                                $csrfToken
+                            );
                             ?>"
                         >
 
@@ -1750,11 +2021,11 @@ function escapeHtml($value)
                      ACCOUNT SECURITY
                 =================================== -->
 
-                <div
-                    class="profile-card profile-full-width"
-                >
+                <div class="profile-card profile-full-width">
 
-                    <h3>Account Security</h3>
+                    <h3>
+                        Account Security
+                    </h3>
 
                     <p class="profile-description">
                         Manage your HealthBridge Medical
@@ -1771,7 +2042,9 @@ function escapeHtml($value)
                             type="email"
                             id="security-email"
                             value="<?php
-                            echo escapeHtml($email);
+                            echo escapeHtml(
+                                $email
+                            );
                             ?>"
                             disabled
                         >
@@ -1780,26 +2053,138 @@ function escapeHtml($value)
 
                     <div class="profile-record">
 
-                        <h4>Password</h4>
+                        <h4>
+                            Password
+                        </h4>
 
                         <p>
-                            Your account password is protected
-                            and is not displayed.
+                            Your account password is securely
+                            hashed and is never displayed.
                         </p>
 
                     </div>
 
-                    <div class="profile-notice">
-                        Password management options will
-                        be added in a future update.
-                    </div>
-
-                    <a
-                        href="logout.php"
+                    <button
+                        type="button"
                         class="profile-button"
+                        id="show-password-form"
                     >
-                        Logout of Account
-                    </a>
+                        Change Password
+                    </button>
+
+                    <form
+                        method="POST"
+                        action="patient-profile.php"
+                        id="password-change-form"
+                        class="password-change-form"
+                        hidden
+                    >
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="change_password"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?php
+                            echo escapeHtml(
+                                $csrfToken
+                            );
+                            ?>"
+                        >
+
+                        <div class="profile-field">
+
+                            <label for="current-password">
+                                Current Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="current-password"
+                                name="current_password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="new-password">
+                                New Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="new-password"
+                                name="new_password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="confirm-password">
+                                Confirm New Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="confirm-password"
+                                name="confirm_password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="profile-notice">
+                            Your new password must be at
+                            least 8 characters long.
+                            HealthBridge never displays
+                            or stores your password in
+                            plain text.
+                        </div>
+
+                        <div class="profile-edit-actions">
+
+                            <button
+                                type="submit"
+                                class="profile-button"
+                            >
+                                Update Password
+                            </button>
+
+                            <button
+                                type="button"
+                                class="profile-cancel-button"
+                                id="cancel-password-change"
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <div class="account-security-logout">
+
+                        <a
+                            href="logout.php"
+                            class="profile-button"
+                        >
+                            Logout of Account
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -1821,7 +2206,9 @@ function escapeHtml($value)
 
                 <div class="footer-brand">
 
-                    <h2>HealthBridge Medical</h2>
+                    <h2>
+                        HealthBridge Medical
+                    </h2>
 
                     <p>
                         Connecting patients with convenient
@@ -1880,7 +2267,7 @@ function escapeHtml($value)
     <script src="../js/script.js?v=4"></script>
 
     <!-- ==========================================
-         PROFILE EDITING JAVASCRIPT
+         PROFILE JAVASCRIPT
     =========================================== -->
 
     <script>
@@ -1890,7 +2277,7 @@ function escapeHtml($value)
             function () {
 
                 // ----------------------------------
-                // REUSABLE EDIT SECTION
+                // REUSABLE EDITABLE SECTION
                 // ----------------------------------
 
                 function setupEditableSection(
@@ -1918,9 +2305,11 @@ function escapeHtml($value)
                     const fields =
                         fieldIds.map(
                             function (id) {
+
                                 return document.getElementById(
                                     id
                                 );
+
                             }
                         );
 
@@ -1935,7 +2324,9 @@ function escapeHtml($value)
                     const originalValues =
                         fields.map(
                             function (field) {
+
                                 return field.value;
+
                             }
                         );
 
@@ -1945,7 +2336,10 @@ function escapeHtml($value)
 
                             fields.forEach(
                                 function (field) {
-                                    field.disabled = false;
+
+                                    field.disabled =
+                                        false;
+
                                 }
                             );
 
@@ -1965,12 +2359,18 @@ function escapeHtml($value)
                         function () {
 
                             fields.forEach(
-                                function (field, index) {
+                                function (
+                                    field,
+                                    index
+                                ) {
 
                                     field.value =
-                                        originalValues[index];
+                                        originalValues[
+                                            index
+                                        ];
 
-                                    field.disabled = true;
+                                    field.disabled =
+                                        true;
 
                                 }
                             );
@@ -1984,7 +2384,7 @@ function escapeHtml($value)
 
                 }
 
-                // PERSONAL INFORMATION
+                // PERSONAL INFO
 
                 setupEditableSection(
                     "edit-personal-information",
@@ -2024,7 +2424,8 @@ function escapeHtml($value)
                         "profile-insurance",
                         "profile-policy",
                         "profile-billing-address",
-                        "profile-payment"
+                        "profile-card-type",
+                        "profile-card-last-four"
                     ]
                 );
 
@@ -2057,7 +2458,8 @@ function escapeHtml($value)
                         "click",
                         function () {
 
-                            medicalForm.hidden = false;
+                            medicalForm.hidden =
+                                false;
 
                             showMedicalFormButton.hidden =
                                 true;
@@ -2080,9 +2482,74 @@ function escapeHtml($value)
 
                             medicalForm.reset();
 
-                            medicalForm.hidden = true;
+                            medicalForm.hidden =
+                                true;
 
                             showMedicalFormButton.hidden =
+                                false;
+
+                        }
+                    );
+
+                }
+
+                // ----------------------------------
+                // PASSWORD CHANGE FORM
+                // ----------------------------------
+
+                const showPasswordButton =
+                    document.getElementById(
+                        "show-password-form"
+                    );
+
+                const passwordForm =
+                    document.getElementById(
+                        "password-change-form"
+                    );
+
+                const cancelPasswordButton =
+                    document.getElementById(
+                        "cancel-password-change"
+                    );
+
+                if (
+                    showPasswordButton &&
+                    passwordForm &&
+                    cancelPasswordButton
+                ) {
+
+                    showPasswordButton.addEventListener(
+                        "click",
+                        function () {
+
+                            passwordForm.hidden =
+                                false;
+
+                            showPasswordButton.hidden =
+                                true;
+
+                            const currentPassword =
+                                document.getElementById(
+                                    "current-password"
+                                );
+
+                            if (currentPassword) {
+                                currentPassword.focus();
+                            }
+
+                        }
+                    );
+
+                    cancelPasswordButton.addEventListener(
+                        "click",
+                        function () {
+
+                            passwordForm.reset();
+
+                            passwordForm.hidden =
+                                true;
+
+                            showPasswordButton.hidden =
                                 false;
 
                         }
