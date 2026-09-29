@@ -38,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $action = $_POST["action"] ?? "";
     $submittedToken = $_POST["csrf_token"] ?? "";
 
-    // Validate CSRF token
     if (!hash_equals($csrfToken, $submittedToken)) {
 
         $profileError =
@@ -84,7 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             } else {
 
-                // Validate date of birth if provided
                 if ($dateOfBirth !== "") {
 
                     $date =
@@ -93,7 +91,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             $dateOfBirth
                         );
 
-                    $dateErrors = DateTime::getLastErrors();
+                    $dateErrors =
+                        DateTime::getLastErrors();
 
                     $dateIsValid =
                         $date !== false &&
@@ -104,14 +103,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $dateErrors["error_count"] === 0
                             )
                         ) &&
-                        $date->format("Y-m-d") === $dateOfBirth;
+                        $date->format("Y-m-d") ===
+                            $dateOfBirth;
 
                     if (!$dateIsValid) {
 
                         $profileError =
                             "Please enter a valid date of birth.";
 
-                    } elseif ($date > new DateTime("today")) {
+                    } elseif (
+                        $date > new DateTime("today")
+                    ) {
 
                         $profileError =
                             "Date of birth cannot be in the future.";
@@ -138,7 +140,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $updateStmt->execute([
                             $firstName,
                             $lastName,
-                            $phone !== "" ? $phone : null,
+                            $phone !== ""
+                                ? $phone
+                                : null,
                             $dateOfBirth !== ""
                                 ? $dateOfBirth
                                 : null,
@@ -148,8 +152,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             $userId
                         ]);
 
-                        // Keep session first name synchronized
-                        $_SESSION["first_name"] = $firstName;
+                        $_SESSION["first_name"] =
+                            $firstName;
 
                         header(
                             "Location: patient-profile.php?profile_updated=1"
@@ -170,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         // --------------------------------------------------
-        // UPDATE ADDRESS INFORMATION
+        // UPDATE ADDRESS
         // --------------------------------------------------
 
         elseif ($action === "update_address") {
@@ -190,8 +194,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $zipCode =
                 trim($_POST["zip_code"] ?? "");
 
-            // Street, city, state, and ZIP are required
-            // when saving an address.
             if (
                 $streetAddress === "" ||
                 $city === "" ||
@@ -202,12 +204,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $profileError =
                     "Street address, city, state, and ZIP code are required.";
 
-            } elseif (strlen($streetAddress) > 150) {
+            } elseif (
+                strlen($streetAddress) > 150
+            ) {
 
                 $profileError =
                     "Street address must be 150 characters or fewer.";
 
-            } elseif (strlen($apartmentSuite) > 50) {
+            } elseif (
+                strlen($apartmentSuite) > 50
+            ) {
 
                 $profileError =
                     "Apartment or suite must be 50 characters or fewer.";
@@ -279,6 +285,251 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
+        // --------------------------------------------------
+        // UPDATE BILLING & INSURANCE
+        // --------------------------------------------------
+
+        elseif ($action === "update_billing") {
+
+            $insuranceProvider =
+                trim($_POST["insurance_provider"] ?? "");
+
+            $policyNumber =
+                trim($_POST["policy_number"] ?? "");
+
+            $billingAddress =
+                trim($_POST["billing_address"] ?? "");
+
+            $paymentMethod =
+                trim($_POST["payment_method"] ?? "");
+
+            if (
+                strlen($insuranceProvider) > 100
+            ) {
+
+                $profileError =
+                    "Insurance provider must be 100 characters or fewer.";
+
+            } elseif (
+                strlen($policyNumber) > 100
+            ) {
+
+                $profileError =
+                    "Policy number must be 100 characters or fewer.";
+
+            } elseif (
+                strlen($billingAddress) > 255
+            ) {
+
+                $profileError =
+                    "Billing address must be 255 characters or fewer.";
+
+            } elseif (
+                strlen($paymentMethod) > 100
+            ) {
+
+                $profileError =
+                    "Payment method description must be 100 characters or fewer.";
+
+            } else {
+
+                try {
+
+                    /*
+                     * One billing record per patient.
+                     *
+                     * If the patient does not have one yet,
+                     * INSERT creates it.
+                     *
+                     * If one already exists, the UNIQUE
+                     * user_id causes the existing row to
+                     * be updated.
+                     */
+
+                    $billingStmt = $pdo->prepare(
+                        "INSERT INTO patient_billing (
+                            user_id,
+                            insurance_provider,
+                            policy_number,
+                            billing_address,
+                            payment_method
+                         )
+                         VALUES (?, ?, ?, ?, ?)
+                         ON DUPLICATE KEY UPDATE
+                            insurance_provider =
+                                VALUES(insurance_provider),
+                            policy_number =
+                                VALUES(policy_number),
+                            billing_address =
+                                VALUES(billing_address),
+                            payment_method =
+                                VALUES(payment_method)"
+                    );
+
+                    $billingStmt->execute([
+                        $userId,
+                        $insuranceProvider !== ""
+                            ? $insuranceProvider
+                            : null,
+                        $policyNumber !== ""
+                            ? $policyNumber
+                            : null,
+                        $billingAddress !== ""
+                            ? $billingAddress
+                            : null,
+                        $paymentMethod !== ""
+                            ? $paymentMethod
+                            : null
+                    ]);
+
+                    header(
+                        "Location: patient-profile.php?billing_updated=1"
+                    );
+                    exit;
+
+                } catch (PDOException $e) {
+
+                    $profileError =
+                        "We could not update your billing and insurance information at this time. Please try again.";
+
+                }
+
+            }
+
+        }
+
+        // --------------------------------------------------
+        // ADD MEDICAL RECORD
+        // --------------------------------------------------
+
+        elseif ($action === "add_medical_record") {
+
+            $recordType =
+                trim($_POST["record_type"] ?? "");
+
+            $recordTitle =
+                trim($_POST["record_title"] ?? "");
+
+            $recordDate =
+                trim($_POST["record_date"] ?? "");
+
+            $recordDetails =
+                trim($_POST["record_details"] ?? "");
+
+            $allowedRecordTypes = [
+                "Medical History",
+                "Medication",
+                "Allergy",
+                "Test Result",
+                "Visit Summary"
+            ];
+
+            if (
+                !in_array(
+                    $recordType,
+                    $allowedRecordTypes,
+                    true
+                )
+            ) {
+
+                $profileError =
+                    "Please select a valid medical record type.";
+
+            } elseif ($recordTitle === "") {
+
+                $profileError =
+                    "Medical record title is required.";
+
+            } elseif (
+                strlen($recordTitle) > 150
+            ) {
+
+                $profileError =
+                    "Medical record title must be 150 characters or fewer.";
+
+            } elseif ($recordDetails === "") {
+
+                $profileError =
+                    "Medical record details are required.";
+
+            } else {
+
+                // Validate optional record date
+                if ($recordDate !== "") {
+
+                    $date =
+                        DateTime::createFromFormat(
+                            "Y-m-d",
+                            $recordDate
+                        );
+
+                    $dateErrors =
+                        DateTime::getLastErrors();
+
+                    $dateIsValid =
+                        $date !== false &&
+                        (
+                            $dateErrors === false ||
+                            (
+                                $dateErrors["warning_count"] === 0 &&
+                                $dateErrors["error_count"] === 0
+                            )
+                        ) &&
+                        $date->format("Y-m-d") ===
+                            $recordDate;
+
+                    if (!$dateIsValid) {
+
+                        $profileError =
+                            "Please enter a valid medical record date.";
+
+                    }
+
+                }
+
+                if ($profileError === "") {
+
+                    try {
+
+                        $recordStmt = $pdo->prepare(
+                            "INSERT INTO medical_records (
+                                user_id,
+                                record_type,
+                                title,
+                                record_details,
+                                record_date
+                             )
+                             VALUES (?, ?, ?, ?, ?)"
+                        );
+
+                        $recordStmt->execute([
+                            $userId,
+                            $recordType,
+                            $recordTitle,
+                            $recordDetails,
+                            $recordDate !== ""
+                                ? $recordDate
+                                : null
+                        ]);
+
+                        header(
+                            "Location: patient-profile.php?record_added=1"
+                        );
+                        exit;
+
+                    } catch (PDOException $e) {
+
+                        $profileError =
+                            "We could not add the medical record at this time. Please try again.";
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
 }
@@ -304,6 +555,26 @@ if (
 
     $profileSuccess =
         "Your address information has been updated successfully.";
+
+}
+
+if (
+    isset($_GET["billing_updated"]) &&
+    $_GET["billing_updated"] === "1"
+) {
+
+    $profileSuccess =
+        "Your billing and insurance information has been updated successfully.";
+
+}
+
+if (
+    isset($_GET["record_added"]) &&
+    $_GET["record_added"] === "1"
+) {
+
+    $profileSuccess =
+        "Your medical record has been added successfully.";
 
 }
 
@@ -340,11 +611,21 @@ if (!$patient) {
 }
 
 // Personal information
-$firstName = $patient["first_name"];
-$lastName = $patient["last_name"];
-$email = $patient["email"];
-$phone = $patient["phone"] ?? "";
-$dateOfBirth = $patient["date_of_birth"] ?? "";
+$firstName =
+    $patient["first_name"];
+
+$lastName =
+    $patient["last_name"];
+
+$email =
+    $patient["email"];
+
+$phone =
+    $patient["phone"] ?? "";
+
+$dateOfBirth =
+    $patient["date_of_birth"] ?? "";
+
 $emergencyContact =
     $patient["emergency_contact"] ?? "";
 
@@ -367,7 +648,65 @@ $zipCode =
 $fullName =
     trim($firstName . " " . $lastName);
 
-// Escape output for safe HTML display
+// --------------------------------------------------
+// RETRIEVE BILLING INFORMATION
+// --------------------------------------------------
+
+$billingStmt = $pdo->prepare(
+    "SELECT
+        insurance_provider,
+        policy_number,
+        billing_address,
+        payment_method
+     FROM patient_billing
+     WHERE user_id = ?"
+);
+
+$billingStmt->execute([$userId]);
+
+$billing =
+    $billingStmt->fetch(PDO::FETCH_ASSOC);
+
+$insuranceProvider =
+    $billing["insurance_provider"] ?? "";
+
+$policyNumber =
+    $billing["policy_number"] ?? "";
+
+$billingAddress =
+    $billing["billing_address"] ?? "";
+
+$paymentMethod =
+    $billing["payment_method"] ?? "";
+
+// --------------------------------------------------
+// RETRIEVE MEDICAL RECORDS
+// --------------------------------------------------
+
+$medicalStmt = $pdo->prepare(
+    "SELECT
+        id,
+        record_type,
+        title,
+        record_details,
+        record_date,
+        created_at
+     FROM medical_records
+     WHERE user_id = ?
+     ORDER BY
+        COALESCE(record_date, DATE(created_at)) DESC,
+        created_at DESC"
+);
+
+$medicalStmt->execute([$userId]);
+
+$medicalRecords =
+    $medicalStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// --------------------------------------------------
+// HELPER FUNCTION
+// --------------------------------------------------
+
 function escapeHtml($value)
 {
     return htmlspecialchars(
@@ -391,12 +730,15 @@ function escapeHtml($value)
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Patient Profile | HealthBridge Medical</title>
+    <title>
+        Patient Profile | HealthBridge Medical
+    </title>
 
-    <!-- Master CSS -->
+    <!-- MASTER CSS -->
+
     <link
         rel="stylesheet"
-        href="../css/style.css?v=6"
+        href="../css/style.css?v=7"
     >
 
     <link
@@ -409,7 +751,9 @@ function escapeHtml($value)
 
 <body>
 
-    <!-- HEADER -->
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
 
     <header>
 
@@ -499,7 +843,9 @@ function escapeHtml($value)
 
     </header>
 
-    <!-- PATIENT PROFILE -->
+    <!-- ==========================================
+         PATIENT PROFILE
+    =========================================== -->
 
     <main>
 
@@ -523,26 +869,30 @@ function escapeHtml($value)
 
             </div>
 
-            <!-- SUCCESS MESSAGE -->
+            <!-- SUCCESS -->
 
             <?php if ($profileSuccess !== ""): ?>
 
                 <div class="profile-success">
+
                     <?php
                     echo escapeHtml($profileSuccess);
                     ?>
+
                 </div>
 
             <?php endif; ?>
 
-            <!-- ERROR MESSAGE -->
+            <!-- ERROR -->
 
             <?php if ($profileError !== ""): ?>
 
                 <div class="profile-error">
+
                     <?php
                     echo escapeHtml($profileError);
                     ?>
+
                 </div>
 
             <?php endif; ?>
@@ -566,15 +916,11 @@ function escapeHtml($value)
                 <div>
 
                     <h3>
-                        <?php
-                        echo escapeHtml($fullName);
-                        ?>
+                        <?php echo escapeHtml($fullName); ?>
                     </h3>
 
                     <p>
-                        <?php
-                        echo escapeHtml($email);
-                        ?>
+                        <?php echo escapeHtml($email); ?>
                     </p>
 
                     <span class="profile-status">
@@ -587,9 +933,9 @@ function escapeHtml($value)
 
             <div class="profile-grid">
 
-                <!-- =====================================
+                <!-- ==================================
                      PERSONAL INFORMATION
-                ====================================== -->
+                =================================== -->
 
                 <div class="profile-card">
 
@@ -624,9 +970,7 @@ function escapeHtml($value)
 
                             <div class="profile-field">
 
-                                <label
-                                    for="profile-first-name"
-                                >
+                                <label for="profile-first-name">
                                     First Name
                                 </label>
 
@@ -636,9 +980,7 @@ function escapeHtml($value)
                                     name="first_name"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml(
-                                        $firstName
-                                    );
+                                    echo escapeHtml($firstName);
                                     ?>"
                                     required
                                     disabled
@@ -648,9 +990,7 @@ function escapeHtml($value)
 
                             <div class="profile-field">
 
-                                <label
-                                    for="profile-last-name"
-                                >
+                                <label for="profile-last-name">
                                     Last Name
                                 </label>
 
@@ -660,9 +1000,7 @@ function escapeHtml($value)
                                     name="last_name"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml(
-                                        $lastName
-                                    );
+                                    echo escapeHtml($lastName);
                                     ?>"
                                     required
                                     disabled
@@ -720,9 +1058,7 @@ function escapeHtml($value)
                                 id="profile-dob"
                                 name="date_of_birth"
                                 value="<?php
-                                echo escapeHtml(
-                                    $dateOfBirth
-                                );
+                                echo escapeHtml($dateOfBirth);
                                 ?>"
                                 max="<?php
                                 echo date("Y-m-d");
@@ -734,9 +1070,7 @@ function escapeHtml($value)
 
                         <div class="profile-field">
 
-                            <label
-                                for="profile-emergency"
-                            >
+                            <label for="profile-emergency">
                                 Emergency Contact
                             </label>
 
@@ -797,9 +1131,9 @@ function escapeHtml($value)
 
                 </div>
 
-                <!-- =====================================
+                <!-- ==================================
                      ADDRESS INFORMATION
-                ====================================== -->
+                =================================== -->
 
                 <div class="profile-card">
 
@@ -842,9 +1176,7 @@ function escapeHtml($value)
                                 name="street_address"
                                 maxlength="150"
                                 value="<?php
-                                echo escapeHtml(
-                                    $streetAddress
-                                );
+                                echo escapeHtml($streetAddress);
                                 ?>"
                                 placeholder="Not provided"
                                 required
@@ -855,9 +1187,7 @@ function escapeHtml($value)
 
                         <div class="profile-field">
 
-                            <label
-                                for="profile-apartment"
-                            >
+                            <label for="profile-apartment">
                                 Apartment / Suite
                             </label>
 
@@ -867,9 +1197,7 @@ function escapeHtml($value)
                                 name="apartment_suite"
                                 maxlength="50"
                                 value="<?php
-                                echo escapeHtml(
-                                    $apartmentSuite
-                                );
+                                echo escapeHtml($apartmentSuite);
                                 ?>"
                                 placeholder="Optional"
                                 disabled
@@ -891,9 +1219,7 @@ function escapeHtml($value)
                                     name="city"
                                     maxlength="100"
                                     value="<?php
-                                    echo escapeHtml(
-                                        $city
-                                    );
+                                    echo escapeHtml($city);
                                     ?>"
                                     placeholder="Not provided"
                                     required
@@ -914,9 +1240,7 @@ function escapeHtml($value)
                                     name="state"
                                     maxlength="50"
                                     value="<?php
-                                    echo escapeHtml(
-                                        $state
-                                    );
+                                    echo escapeHtml($state);
                                     ?>"
                                     placeholder="Not provided"
                                     required
@@ -939,12 +1263,9 @@ function escapeHtml($value)
                                 name="zip_code"
                                 maxlength="10"
                                 value="<?php
-                                echo escapeHtml(
-                                    $zipCode
-                                );
+                                echo escapeHtml($zipCode);
                                 ?>"
                                 placeholder="Not provided"
-                                inputmode="numeric"
                                 required
                                 disabled
                             >
@@ -953,8 +1274,7 @@ function escapeHtml($value)
 
                         <div class="profile-notice">
                             Your saved address is used
-                            as your primary patient
-                            address.
+                            as your primary patient address.
                         </div>
 
                         <div class="profile-edit-actions">
@@ -991,9 +1311,9 @@ function escapeHtml($value)
 
                 </div>
 
-                <!-- =====================================
-                     BILLING AND INSURANCE
-                ====================================== -->
+                <!-- ==================================
+                     BILLING & INSURANCE
+                =================================== -->
 
                 <div class="profile-card">
 
@@ -1004,166 +1324,431 @@ function escapeHtml($value)
                         billing address, and payment details.
                     </p>
 
-                    <div class="profile-field">
-
-                        <label for="profile-insurance">
-                            Insurance Provider
-                        </label>
-
-                        <input
-                            type="text"
-                            id="profile-insurance"
-                            placeholder="Not provided"
-                            disabled
-                        >
-
-                    </div>
-
-                    <div class="profile-field">
-
-                        <label for="profile-policy">
-                            Insurance Policy Number
-                        </label>
-
-                        <input
-                            type="text"
-                            id="profile-policy"
-                            placeholder="Not provided"
-                            disabled
-                        >
-
-                    </div>
-
-                    <div class="profile-field">
-
-                        <label
-                            for="profile-billing-address"
-                        >
-                            Billing Address
-                        </label>
-
-                        <input
-                            type="text"
-                            id="profile-billing-address"
-                            placeholder="Not provided"
-                            disabled
-                        >
-
-                    </div>
-
-                    <div class="profile-field">
-
-                        <label for="profile-payment">
-                            Payment Method
-                        </label>
-
-                        <input
-                            type="text"
-                            id="profile-payment"
-                            placeholder="No payment method on file"
-                            disabled
-                        >
-
-                    </div>
-
-                    <div class="profile-notice">
-                        Billing and insurance features
-                        are currently demonstration
-                        placeholders. Do not enter real
-                        payment-card or insurance
-                        information.
-                    </div>
-
-                    <button
-                        type="button"
-                        class="profile-button"
-                        disabled
+                    <form
+                        method="POST"
+                        action="patient-profile.php"
+                        id="billing-information-form"
                     >
-                        Manage Billing
-                    </button>
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="update_billing"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?php
+                            echo escapeHtml($csrfToken);
+                            ?>"
+                        >
+
+                        <div class="profile-field">
+
+                            <label for="profile-insurance">
+                                Insurance Provider
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profile-insurance"
+                                name="insurance_provider"
+                                maxlength="100"
+                                value="<?php
+                                echo escapeHtml(
+                                    $insuranceProvider
+                                );
+                                ?>"
+                                placeholder="Not provided"
+                                disabled
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="profile-policy">
+                                Insurance Policy Number
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profile-policy"
+                                name="policy_number"
+                                maxlength="100"
+                                value="<?php
+                                echo escapeHtml(
+                                    $policyNumber
+                                );
+                                ?>"
+                                placeholder="Not provided"
+                                disabled
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label
+                                for="profile-billing-address"
+                            >
+                                Billing Address
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profile-billing-address"
+                                name="billing_address"
+                                maxlength="255"
+                                value="<?php
+                                echo escapeHtml(
+                                    $billingAddress
+                                );
+                                ?>"
+                                placeholder="Not provided"
+                                disabled
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="profile-payment">
+                                Payment Method
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profile-payment"
+                                name="payment_method"
+                                maxlength="100"
+                                value="<?php
+                                echo escapeHtml(
+                                    $paymentMethod
+                                );
+                                ?>"
+                                placeholder="Example: Visa ending in 4242"
+                                disabled
+                            >
+
+                        </div>
+
+                        <div class="profile-notice">
+                            HealthBridge is an educational
+                            demonstration. Do not enter real
+                            payment-card, banking, or insurance
+                            information.
+                        </div>
+
+                        <div class="profile-edit-actions">
+
+                            <button
+                                type="button"
+                                class="profile-button"
+                                id="edit-billing"
+                            >
+                                Manage Billing
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="profile-button"
+                                id="save-billing"
+                                hidden
+                            >
+                                Save Billing
+                            </button>
+
+                            <button
+                                type="button"
+                                class="profile-cancel-button"
+                                id="cancel-billing"
+                                hidden
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
-                <!-- =====================================
+                <!-- ==================================
                      MEDICAL RECORDS
-                ====================================== -->
+                =================================== -->
 
                 <div class="profile-card">
 
                     <h3>Medical Records</h3>
 
                     <p class="profile-description">
-                        Access your medical history,
-                        medications, allergies, and
-                        healthcare visit summaries.
+                        Add and review medical history,
+                        medications, allergies, test results,
+                        and visit summaries.
                     </p>
 
-                    <div class="profile-record">
+                    <!-- EXISTING RECORDS -->
 
-                        <h4>Medical History</h4>
+                    <div class="medical-record-list">
 
-                        <p>
-                            No medical history is currently
-                            available in your patient profile.
-                        </p>
+                        <?php if (empty($medicalRecords)): ?>
+
+                            <div class="profile-record">
+
+                                <h4>
+                                    No Medical Records
+                                </h4>
+
+                                <p>
+                                    No medical records have
+                                    been added to this patient
+                                    profile yet.
+                                </p>
+
+                            </div>
+
+                        <?php else: ?>
+
+                            <?php
+                            foreach ($medicalRecords as $record):
+                            ?>
+
+                                <div class="profile-record">
+
+                                    <div
+                                        class="medical-record-heading"
+                                    >
+
+                                        <span
+                                            class="medical-record-type"
+                                        >
+                                            <?php
+                                            echo escapeHtml(
+                                                $record[
+                                                    "record_type"
+                                                ]
+                                            );
+                                            ?>
+                                        </span>
+
+                                        <?php
+                                        if (
+                                            !empty(
+                                                $record[
+                                                    "record_date"
+                                                ]
+                                            )
+                                        ):
+                                        ?>
+
+                                            <span
+                                                class="medical-record-date"
+                                            >
+                                                <?php
+                                                echo escapeHtml(
+                                                    date(
+                                                        "m/d/Y",
+                                                        strtotime(
+                                                            $record[
+                                                                "record_date"
+                                                            ]
+                                                        )
+                                                    )
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                    <h4>
+                                        <?php
+                                        echo escapeHtml(
+                                            $record["title"]
+                                        );
+                                        ?>
+                                    </h4>
+
+                                    <p>
+                                        <?php
+                                        echo nl2br(
+                                            escapeHtml(
+                                                $record[
+                                                    "record_details"
+                                                ]
+                                            )
+                                        );
+                                        ?>
+                                    </p>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        <?php endif; ?>
 
                     </div>
 
-                    <div class="profile-record">
+                    <!-- ADD RECORD BUTTON -->
 
-                        <h4>Medications</h4>
+                    <div class="medical-record-actions">
 
-                        <p>
-                            No medication records are
-                            currently available.
-                        </p>
-
-                    </div>
-
-                    <div class="profile-record">
-
-                        <h4>Allergies</h4>
-
-                        <p>
-                            No allergy information has
-                            been added to your profile.
-                        </p>
+                        <button
+                            type="button"
+                            class="profile-button"
+                            id="show-medical-record-form"
+                        >
+                            Add Medical Record
+                        </button>
 
                     </div>
 
-                    <div class="profile-record">
+                    <!-- ADD RECORD FORM -->
 
-                        <h4>Test Results</h4>
+                    <form
+                        method="POST"
+                        action="patient-profile.php"
+                        id="medical-record-form"
+                        class="medical-record-form"
+                        hidden
+                    >
 
-                        <p>
-                            No test results are
-                            currently available.
-                        </p>
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="add_medical_record"
+                        >
 
-                    </div>
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?php
+                            echo escapeHtml($csrfToken);
+                            ?>"
+                        >
 
-                    <div class="profile-record">
+                        <div class="profile-field">
 
-                        <h4>Visit Summaries</h4>
+                            <label for="record-type">
+                                Record Type
+                            </label>
 
-                        <p>
-                            No medical visit summaries
-                            are currently available.
-                        </p>
+                            <select
+                                id="record-type"
+                                name="record_type"
+                                required
+                            >
 
-                    </div>
+                                <option value="">
+                                    Select record type
+                                </option>
 
-                    <div class="profile-notice">
-                        Medical records will be connected
-                        to the patient database in a
-                        future development stage.
-                    </div>
+                                <option value="Medical History">
+                                    Medical History
+                                </option>
+
+                                <option value="Medication">
+                                    Medication
+                                </option>
+
+                                <option value="Allergy">
+                                    Allergy
+                                </option>
+
+                                <option value="Test Result">
+                                    Test Result
+                                </option>
+
+                                <option value="Visit Summary">
+                                    Visit Summary
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="record-title">
+                                Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="record-title"
+                                name="record_title"
+                                maxlength="150"
+                                placeholder="Record title"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="record-date">
+                                Record Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="record-date"
+                                name="record_date"
+                            >
+
+                        </div>
+
+                        <div class="profile-field">
+
+                            <label for="record-details">
+                                Details
+                            </label>
+
+                            <textarea
+                                id="record-details"
+                                name="record_details"
+                                rows="5"
+                                placeholder="Enter record details"
+                                required
+                            ></textarea>
+
+                        </div>
+
+                        <div class="profile-notice">
+                            For this educational project,
+                            use fictional demonstration
+                            medical information only.
+                        </div>
+
+                        <div class="profile-edit-actions">
+
+                            <button
+                                type="submit"
+                                class="profile-button"
+                            >
+                                Save Medical Record
+                            </button>
+
+                            <button
+                                type="button"
+                                class="profile-cancel-button"
+                                id="cancel-medical-record"
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
-                <!-- =====================================
+                <!-- ==================================
                      ACCOUNT SECURITY
-                ====================================== -->
+                =================================== -->
 
                 <div
                     class="profile-card profile-full-width"
@@ -1198,8 +1783,8 @@ function escapeHtml($value)
                         <h4>Password</h4>
 
                         <p>
-                            Your account password is
-                            protected and is not displayed.
+                            Your account password is protected
+                            and is not displayed.
                         </p>
 
                     </div>
@@ -1224,7 +1809,9 @@ function escapeHtml($value)
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
 
     <footer>
 
@@ -1234,9 +1821,7 @@ function escapeHtml($value)
 
                 <div class="footer-brand">
 
-                    <h2>
-                        HealthBridge Medical
-                    </h2>
+                    <h2>HealthBridge Medical</h2>
 
                     <p>
                         Connecting patients with convenient
@@ -1280,24 +1865,23 @@ function escapeHtml($value)
         <div class="footer-bottom">
 
             <p>
-                © 2026 HealthBridge Medical. This website
-                is a mock educational project and does
-                not provide real medical services.
+                © 2026 HealthBridge Medical.
+                This website is a mock educational
+                project and does not provide real
+                medical services.
             </p>
 
         </div>
 
     </footer>
 
-    <!-- CHATBOT -->
-
     <?php require_once "chatbot-widget.php"; ?>
-
-    <!-- MASTER JAVASCRIPT -->
 
     <script src="../js/script.js?v=4"></script>
 
-    <!-- PROFILE EDITING -->
+    <!-- ==========================================
+         PROFILE EDITING JAVASCRIPT
+    =========================================== -->
 
     <script>
 
@@ -1305,179 +1889,206 @@ function escapeHtml($value)
             "DOMContentLoaded",
             function () {
 
-                // -----------------------------------------
+                // ----------------------------------
+                // REUSABLE EDIT SECTION
+                // ----------------------------------
+
+                function setupEditableSection(
+                    editButtonId,
+                    saveButtonId,
+                    cancelButtonId,
+                    fieldIds
+                ) {
+
+                    const editButton =
+                        document.getElementById(
+                            editButtonId
+                        );
+
+                    const saveButton =
+                        document.getElementById(
+                            saveButtonId
+                        );
+
+                    const cancelButton =
+                        document.getElementById(
+                            cancelButtonId
+                        );
+
+                    const fields =
+                        fieldIds.map(
+                            function (id) {
+                                return document.getElementById(
+                                    id
+                                );
+                            }
+                        );
+
+                    if (
+                        !editButton ||
+                        !saveButton ||
+                        !cancelButton
+                    ) {
+                        return;
+                    }
+
+                    const originalValues =
+                        fields.map(
+                            function (field) {
+                                return field.value;
+                            }
+                        );
+
+                    editButton.addEventListener(
+                        "click",
+                        function () {
+
+                            fields.forEach(
+                                function (field) {
+                                    field.disabled = false;
+                                }
+                            );
+
+                            editButton.hidden = true;
+                            saveButton.hidden = false;
+                            cancelButton.hidden = false;
+
+                            if (fields[0]) {
+                                fields[0].focus();
+                            }
+
+                        }
+                    );
+
+                    cancelButton.addEventListener(
+                        "click",
+                        function () {
+
+                            fields.forEach(
+                                function (field, index) {
+
+                                    field.value =
+                                        originalValues[index];
+
+                                    field.disabled = true;
+
+                                }
+                            );
+
+                            saveButton.hidden = true;
+                            cancelButton.hidden = true;
+                            editButton.hidden = false;
+
+                        }
+                    );
+
+                }
+
                 // PERSONAL INFORMATION
-                // -----------------------------------------
 
-                const editPersonalButton =
-                    document.getElementById(
-                        "edit-personal-information"
-                    );
-
-                const savePersonalButton =
-                    document.getElementById(
-                        "save-personal-information"
-                    );
-
-                const cancelPersonalButton =
-                    document.getElementById(
-                        "cancel-personal-information"
-                    );
-
-                const personalFields = [
-                    document.getElementById(
-                        "profile-first-name"
-                    ),
-                    document.getElementById(
-                        "profile-last-name"
-                    ),
-                    document.getElementById(
-                        "profile-phone"
-                    ),
-                    document.getElementById(
-                        "profile-dob"
-                    ),
-                    document.getElementById(
+                setupEditableSection(
+                    "edit-personal-information",
+                    "save-personal-information",
+                    "cancel-personal-information",
+                    [
+                        "profile-first-name",
+                        "profile-last-name",
+                        "profile-phone",
+                        "profile-dob",
                         "profile-emergency"
-                    )
-                ];
-
-                const personalOriginalValues =
-                    personalFields.map(
-                        function (field) {
-                            return field.value;
-                        }
-                    );
-
-                editPersonalButton.addEventListener(
-                    "click",
-                    function () {
-
-                        personalFields.forEach(
-                            function (field) {
-                                field.disabled = false;
-                            }
-                        );
-
-                        editPersonalButton.hidden = true;
-                        savePersonalButton.hidden = false;
-                        cancelPersonalButton.hidden = false;
-
-                        personalFields[0].focus();
-
-                    }
+                    ]
                 );
 
-                cancelPersonalButton.addEventListener(
-                    "click",
-                    function () {
+                // ADDRESS
 
-                        personalFields.forEach(
-                            function (field, index) {
-
-                                field.value =
-                                    personalOriginalValues[
-                                        index
-                                    ];
-
-                                field.disabled = true;
-
-                            }
-                        );
-
-                        savePersonalButton.hidden = true;
-                        cancelPersonalButton.hidden = true;
-                        editPersonalButton.hidden = false;
-
-                    }
-                );
-
-                // -----------------------------------------
-                // ADDRESS INFORMATION
-                // -----------------------------------------
-
-                const editAddressButton =
-                    document.getElementById(
-                        "edit-address"
-                    );
-
-                const saveAddressButton =
-                    document.getElementById(
-                        "save-address"
-                    );
-
-                const cancelAddressButton =
-                    document.getElementById(
-                        "cancel-address"
-                    );
-
-                const addressFields = [
-                    document.getElementById(
-                        "profile-street"
-                    ),
-                    document.getElementById(
-                        "profile-apartment"
-                    ),
-                    document.getElementById(
-                        "profile-city"
-                    ),
-                    document.getElementById(
-                        "profile-state"
-                    ),
-                    document.getElementById(
+                setupEditableSection(
+                    "edit-address",
+                    "save-address",
+                    "cancel-address",
+                    [
+                        "profile-street",
+                        "profile-apartment",
+                        "profile-city",
+                        "profile-state",
                         "profile-zip"
-                    )
-                ];
+                    ]
+                );
 
-                const addressOriginalValues =
-                    addressFields.map(
-                        function (field) {
-                            return field.value;
+                // BILLING
+
+                setupEditableSection(
+                    "edit-billing",
+                    "save-billing",
+                    "cancel-billing",
+                    [
+                        "profile-insurance",
+                        "profile-policy",
+                        "profile-billing-address",
+                        "profile-payment"
+                    ]
+                );
+
+                // ----------------------------------
+                // MEDICAL RECORD FORM
+                // ----------------------------------
+
+                const showMedicalFormButton =
+                    document.getElementById(
+                        "show-medical-record-form"
+                    );
+
+                const medicalForm =
+                    document.getElementById(
+                        "medical-record-form"
+                    );
+
+                const cancelMedicalButton =
+                    document.getElementById(
+                        "cancel-medical-record"
+                    );
+
+                if (
+                    showMedicalFormButton &&
+                    medicalForm &&
+                    cancelMedicalButton
+                ) {
+
+                    showMedicalFormButton.addEventListener(
+                        "click",
+                        function () {
+
+                            medicalForm.hidden = false;
+
+                            showMedicalFormButton.hidden =
+                                true;
+
+                            const recordType =
+                                document.getElementById(
+                                    "record-type"
+                                );
+
+                            if (recordType) {
+                                recordType.focus();
+                            }
+
                         }
                     );
 
-                editAddressButton.addEventListener(
-                    "click",
-                    function () {
+                    cancelMedicalButton.addEventListener(
+                        "click",
+                        function () {
 
-                        addressFields.forEach(
-                            function (field) {
-                                field.disabled = false;
-                            }
-                        );
+                            medicalForm.reset();
 
-                        editAddressButton.hidden = true;
-                        saveAddressButton.hidden = false;
-                        cancelAddressButton.hidden = false;
+                            medicalForm.hidden = true;
 
-                        addressFields[0].focus();
+                            showMedicalFormButton.hidden =
+                                false;
 
-                    }
-                );
+                        }
+                    );
 
-                cancelAddressButton.addEventListener(
-                    "click",
-                    function () {
-
-                        addressFields.forEach(
-                            function (field, index) {
-
-                                field.value =
-                                    addressOriginalValues[
-                                        index
-                                    ];
-
-                                field.disabled = true;
-
-                            }
-                        );
-
-                        saveAddressButton.hidden = true;
-                        cancelAddressButton.hidden = true;
-                        editAddressButton.hidden = false;
-
-                    }
-                );
+                }
 
             }
         );
