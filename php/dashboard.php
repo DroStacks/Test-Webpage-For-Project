@@ -14,6 +14,15 @@ $userId = $_SESSION["user_id"];
 $firstName = $_SESSION["first_name"];
 $email = $_SESSION["email"] ?? "";
 
+// CSRF token for dashboard actions
+if (empty($_SESSION["dashboard_csrf_token"])) {
+    $_SESSION["dashboard_csrf_token"] =
+        bin2hex(random_bytes(32));
+}
+
+$dashboardCsrfToken =
+    $_SESSION["dashboard_csrf_token"];
+
 // Get this user's membership information
 $stmt = $pdo->prepare(
     "SELECT
@@ -29,7 +38,7 @@ $stmt->execute([$userId]);
 $membership = $stmt->fetch();
 
 
-// Get this user's upcoming active appointments
+// Get this user's appointment history
 $stmt = $pdo->prepare(
     "SELECT
         id,
@@ -40,14 +49,18 @@ $stmt = $pdo->prepare(
         status
      FROM appointments
      WHERE user_id = ?
-       AND appointment_date >= CURDATE()
-       AND status = 'Scheduled'
-     ORDER BY appointment_date ASC, appointment_time ASC"
+       AND (
+            appointment_date < CURDATE()
+            OR status = 'Cancelled'
+       )
+     ORDER BY
+        appointment_date DESC,
+        appointment_time DESC"
 );
 
 $stmt->execute([$userId]);
 
-$appointments = $stmt->fetchAll();
+$appointmentHistory = $stmt->fetchAll();
 
 
 // Get this user's appointment history
@@ -297,21 +310,30 @@ $appointmentHistory = $stmt->fetchAll();
                                     </p>
 
 
-                                    <?php if (
-                                        $appointment["status"] === "Scheduled"
-                                    ): ?>
+                                        <?php if (
+                                            in_array(
+                                                $appointment["status"],
+                                                ["Pending", "Confirmed"],
+                                                true
+                                            )
+                                        ): ?>
 
                                         <form
                                             action="cancel-appointment.php"
                                             method="post"
                                             class="cancel-appointment-form"
+                                            onsubmit="return confirm('Are you sure you want to cancel this appointment request?');"
                                         >
 
                                             <input
-                                                type="hidden"
-                                                name="appointment_id"
-                                                value="<?php echo (int) $appointment["id"]; ?>"
-                                            >
+                                                    type="hidden"
+                                                    name="csrf_token"
+                                                    value="<?php echo htmlspecialchars(
+                                                        $dashboardCsrfToken,
+                                                        ENT_QUOTES,
+                                                        "UTF-8"
+                                                    ); ?>"
+                                                >
 
                                             <button
                                                 type="submit"
