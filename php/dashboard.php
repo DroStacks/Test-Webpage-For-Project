@@ -1,4 +1,3 @@
-
 <?php
 
 session_start();
@@ -14,7 +13,11 @@ $userId = $_SESSION["user_id"];
 $firstName = $_SESSION["first_name"];
 $email = $_SESSION["email"] ?? "";
 
-// CSRF token for dashboard actions
+
+// --------------------------------------------------
+// CSRF TOKEN FOR DASHBOARD ACTIONS
+// --------------------------------------------------
+
 if (empty($_SESSION["dashboard_csrf_token"])) {
     $_SESSION["dashboard_csrf_token"] =
         bin2hex(random_bytes(32));
@@ -23,7 +26,11 @@ if (empty($_SESSION["dashboard_csrf_token"])) {
 $dashboardCsrfToken =
     $_SESSION["dashboard_csrf_token"];
 
-// Get this user's membership information
+
+// --------------------------------------------------
+// GET MEMBERSHIP INFORMATION
+// --------------------------------------------------
+
 $stmt = $pdo->prepare(
     "SELECT
         membership_plan,
@@ -38,7 +45,36 @@ $stmt->execute([$userId]);
 $membership = $stmt->fetch();
 
 
-// Get this user's appointment history
+// --------------------------------------------------
+// GET UPCOMING ACTIVE APPOINTMENTS
+// --------------------------------------------------
+
+$stmt = $pdo->prepare(
+    "SELECT
+        id,
+        appointment_date,
+        appointment_time,
+        service,
+        reason,
+        status
+     FROM appointments
+     WHERE user_id = ?
+       AND appointment_date >= CURDATE()
+       AND status IN ('Pending', 'Confirmed')
+     ORDER BY
+        appointment_date ASC,
+        appointment_time ASC"
+);
+
+$stmt->execute([$userId]);
+
+$appointments = $stmt->fetchAll();
+
+
+// --------------------------------------------------
+// GET APPOINTMENT HISTORY
+// --------------------------------------------------
+
 $stmt = $pdo->prepare(
     "SELECT
         id,
@@ -62,75 +98,87 @@ $stmt->execute([$userId]);
 
 $appointmentHistory = $stmt->fetchAll();
 
-
-// Get this user's appointment history
-$stmt = $pdo->prepare(
-    "SELECT
-        id,
-        appointment_date,
-        appointment_time,
-        service,
-        reason,
-        status
-     FROM appointments
-     WHERE user_id = ?
-       AND (
-            appointment_date < CURDATE()
-            OR status <> 'Scheduled'
-       )
-     ORDER BY appointment_date DESC, appointment_time DESC"
-);
-
-$stmt->execute([$userId]);
-
-$appointmentHistory = $stmt->fetchAll();
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Patient Dashboard | HealthBridge Medical</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="../css/style.css?v=3">
-    <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+    <title>
+        Patient Dashboard | HealthBridge Medical
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css?v=3"
+    >
+
+    <link
+        rel="icon"
+        type="image/x-icon"
+        href="../images/favicon.ico"
+    >
+
 </head>
 
 <body>
 
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
     <header>
 
         <div class="utility-bar">
+
             <div class="utility-content">
 
                 <div class="utility-left">
-                    <a href="../html/contact.php">Support Center</a>
+
+                    <a href="../html/contact.php">
+                        Support Center
+                    </a>
+
                     <span>|</span>
-                    <span>Language: English</span>
+
+                    <span>
+                        Language: English
+                    </span>
+
                 </div>
 
                 <div class="utility-right">
 
                     <span>
                         Welcome,
-                        <?php echo htmlspecialchars(
+                        <?php
+                        echo htmlspecialchars(
                             $firstName,
                             ENT_QUOTES,
                             "UTF-8"
-                        ); ?>
+                        );
+                        ?>
                     </span>
 
-                    <a href="logout.php" class="login-button">
+                    <a
+                        href="logout.php"
+                        class="login-button"
+                    >
                         Logout
                     </a>
 
                 </div>
 
             </div>
+
         </div>
 
 
@@ -139,15 +187,45 @@ $appointmentHistory = $stmt->fetchAll();
             <nav>
 
                 <div class="logo">
-                    <h1>HealthBridge Medical</h1>
+
+                    <h1>
+                        HealthBridge Medical
+                    </h1>
+
                 </div>
 
                 <ul class="nav-links">
-                    <li><a href="../index.php">Home</a></li>
-                    <li><a href="../html/services.php">Services</a></li>
-                    <li><a href="../html/membership.php">Memberships</a></li>
-                    <li><a href="../html/appointment.php">Appointments</a></li>
-                    <li><a href="../html/contact.php">Contact</a></li>
+
+                    <li>
+                        <a href="../index.php">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../html/services.php">
+                            Services
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../html/membership.php">
+                            Memberships
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../html/appointment.php">
+                            Appointments
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="../html/contact.php">
+                            Contact
+                        </a>
+                    </li>
+
                 </ul>
 
             </nav>
@@ -157,6 +235,10 @@ $appointmentHistory = $stmt->fetchAll();
     </header>
 
 
+    <!-- ==========================================
+         MAIN
+    =========================================== -->
+
     <main>
 
         <section class="dashboard-page">
@@ -165,11 +247,13 @@ $appointmentHistory = $stmt->fetchAll();
 
                 <h2>
                     Welcome,
-                    <?php echo htmlspecialchars(
+                    <?php
+                    echo htmlspecialchars(
                         $firstName,
                         ENT_QUOTES,
                         "UTF-8"
-                    ); ?>!
+                    );
+                    ?>!
                 </h2>
 
                 <p>
@@ -179,6 +263,10 @@ $appointmentHistory = $stmt->fetchAll();
 
             </div>
 
+
+            <!-- ==================================
+                 APPOINTMENT MESSAGES
+            =================================== -->
 
             <?php if (
                 isset($_GET["appointment"]) &&
@@ -205,12 +293,79 @@ $appointmentHistory = $stmt->fetchAll();
 
 
             <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "cannot_cancel"
+            ): ?>
+
+                <div class="dashboard-error">
+                    This appointment cannot be cancelled.
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "not_found"
+            ): ?>
+
+                <div class="dashboard-error">
+                    The requested appointment could not be found.
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "invalid"
+            ): ?>
+
+                <div class="dashboard-error">
+                    Invalid appointment request.
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "csrf_error"
+            ): ?>
+
+                <div class="dashboard-error">
+                    Your session could not be verified.
+                    Please try again.
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if (
+                isset($_GET["appointment"]) &&
+                $_GET["appointment"] === "error"
+            ): ?>
+
+                <div class="dashboard-error">
+                    The appointment could not be updated.
+                    Please try again.
+                </div>
+
+            <?php endif; ?>
+
+
+            <!-- ==================================
+                 MEMBERSHIP MESSAGE
+            =================================== -->
+
+            <?php if (
                 isset($_GET["membership"]) &&
                 $_GET["membership"] === "success"
             ): ?>
 
                 <div class="dashboard-success">
-                    Your HealthBridge Medical membership was activated successfully.
+                    Your HealthBridge Medical membership
+                    was activated successfully.
                 </div>
 
             <?php endif; ?>
@@ -218,11 +373,16 @@ $appointmentHistory = $stmt->fetchAll();
 
             <div class="dashboard-grid">
 
-                <!-- UPCOMING APPOINTMENTS -->
+
+                <!-- ==================================
+                     UPCOMING APPOINTMENTS
+                =================================== -->
 
                 <div class="dashboard-section">
 
-                    <h3>Upcoming Appointments</h3>
+                    <h3>
+                        Upcoming Appointments
+                    </h3>
 
                     <?php if (count($appointments) > 0): ?>
 
@@ -233,23 +393,38 @@ $appointmentHistory = $stmt->fetchAll();
                                 <?php
 
                                 $serviceNames = [
-                                    "primary-care" => "Primary Care",
-                                    "preventive-care" => "Preventive Care",
-                                    "family-medicine" => "Family Medicine"
+                                    "primary-care" =>
+                                        "Primary Care",
+
+                                    "preventive-care" =>
+                                        "Preventive Care",
+
+                                    "family-medicine" =>
+                                        "Family Medicine"
                                 ];
 
                                 $serviceName =
-                                    $serviceNames[$appointment["service"]]
+                                    $serviceNames[
+                                        $appointment["service"]
+                                    ]
                                     ?? $appointment["service"];
 
                                 $formattedDate = date(
                                     "F j, Y",
-                                    strtotime($appointment["appointment_date"])
+                                    strtotime(
+                                        $appointment[
+                                            "appointment_date"
+                                        ]
+                                    )
                                 );
 
                                 $formattedTime = date(
                                     "g:i A",
-                                    strtotime($appointment["appointment_time"])
+                                    strtotime(
+                                        $appointment[
+                                            "appointment_time"
+                                        ]
+                                    )
                                 );
 
                                 ?>
@@ -259,64 +434,89 @@ $appointmentHistory = $stmt->fetchAll();
                                     <div class="appointment-item-header">
 
                                         <h4>
-                                            <?php echo htmlspecialchars(
+                                            <?php
+                                            echo htmlspecialchars(
                                                 $serviceName,
                                                 ENT_QUOTES,
                                                 "UTF-8"
-                                            ); ?>
+                                            );
+                                            ?>
                                         </h4>
 
                                         <span class="appointment-status">
-                                            <?php echo htmlspecialchars(
+                                            <?php
+                                            echo htmlspecialchars(
                                                 $appointment["status"],
                                                 ENT_QUOTES,
                                                 "UTF-8"
-                                            ); ?>
+                                            );
+                                            ?>
                                         </span>
 
                                     </div>
 
 
                                     <p>
-                                        <strong>Date:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                        <strong>
+                                            Date:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $formattedDate,
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
 
                                     <p>
-                                        <strong>Time:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                        <strong>
+                                            Time:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $formattedTime,
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
 
                                     <p>
-                                        <strong>Reason:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                        <strong>
+                                            Reason:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $appointment["reason"],
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
 
-                                        <?php if (
-                                            in_array(
-                                                $appointment["status"],
-                                                ["Pending", "Confirmed"],
-                                                true
-                                            )
-                                        ): ?>
+                                    <?php if (
+                                        in_array(
+                                            $appointment["status"],
+                                            [
+                                                "Pending",
+                                                "Confirmed"
+                                            ],
+                                            true
+                                        )
+                                    ): ?>
 
                                         <form
                                             action="cancel-appointment.php"
@@ -326,14 +526,25 @@ $appointmentHistory = $stmt->fetchAll();
                                         >
 
                                             <input
-                                                    type="hidden"
-                                                    name="csrf_token"
-                                                    value="<?php echo htmlspecialchars(
-                                                        $dashboardCsrfToken,
-                                                        ENT_QUOTES,
-                                                        "UTF-8"
-                                                    ); ?>"
-                                                >
+                                                type="hidden"
+                                                name="appointment_id"
+                                                value="<?php
+                                                echo (int)
+                                                    $appointment["id"];
+                                                ?>"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="<?php
+                                                echo htmlspecialchars(
+                                                    $dashboardCsrfToken,
+                                                    ENT_QUOTES,
+                                                    "UTF-8"
+                                                );
+                                                ?>"
+                                            >
 
                                             <button
                                                 type="submit"
@@ -355,7 +566,8 @@ $appointmentHistory = $stmt->fetchAll();
                     <?php else: ?>
 
                         <p class="dashboard-empty">
-                            You currently have no upcoming appointments.
+                            You currently have no upcoming
+                            appointments.
                         </p>
 
                     <?php endif; ?>
@@ -371,38 +583,62 @@ $appointmentHistory = $stmt->fetchAll();
                 </div>
 
 
-                <!-- APPOINTMENT HISTORY -->
+                <!-- ==================================
+                     APPOINTMENT HISTORY
+                =================================== -->
 
                 <div class="dashboard-section">
 
-                    <h3>Appointment History</h3>
+                    <h3>
+                        Appointment History
+                    </h3>
 
-                    <?php if (count($appointmentHistory) > 0): ?>
+                    <?php if (
+                        count($appointmentHistory) > 0
+                    ): ?>
 
                         <div class="appointment-list">
 
-                            <?php foreach ($appointmentHistory as $appointment): ?>
+                            <?php foreach (
+                                $appointmentHistory
+                                as $appointment
+                            ): ?>
 
                                 <?php
 
                                 $serviceNames = [
-                                    "primary-care" => "Primary Care",
-                                    "preventive-care" => "Preventive Care",
-                                    "family-medicine" => "Family Medicine"
+                                    "primary-care" =>
+                                        "Primary Care",
+
+                                    "preventive-care" =>
+                                        "Preventive Care",
+
+                                    "family-medicine" =>
+                                        "Family Medicine"
                                 ];
 
                                 $serviceName =
-                                    $serviceNames[$appointment["service"]]
+                                    $serviceNames[
+                                        $appointment["service"]
+                                    ]
                                     ?? $appointment["service"];
 
                                 $formattedDate = date(
                                     "F j, Y",
-                                    strtotime($appointment["appointment_date"])
+                                    strtotime(
+                                        $appointment[
+                                            "appointment_date"
+                                        ]
+                                    )
                                 );
 
                                 $formattedTime = date(
                                     "g:i A",
-                                    strtotime($appointment["appointment_time"])
+                                    strtotime(
+                                        $appointment[
+                                            "appointment_time"
+                                        ]
+                                    )
                                 );
 
                                 ?>
@@ -412,51 +648,76 @@ $appointmentHistory = $stmt->fetchAll();
                                     <div class="appointment-item-header">
 
                                         <h4>
-                                            <?php echo htmlspecialchars(
+                                            <?php
+                                            echo htmlspecialchars(
                                                 $serviceName,
                                                 ENT_QUOTES,
                                                 "UTF-8"
-                                            ); ?>
+                                            );
+                                            ?>
                                         </h4>
 
                                         <span class="appointment-status">
-                                            <?php echo htmlspecialchars(
+                                            <?php
+                                            echo htmlspecialchars(
                                                 $appointment["status"],
                                                 ENT_QUOTES,
                                                 "UTF-8"
-                                            ); ?>
+                                            );
+                                            ?>
                                         </span>
 
                                     </div>
 
-                                    <p>
-                                        <strong>Date:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                    <p>
+
+                                        <strong>
+                                            Date:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $formattedDate,
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
-                                    <p>
-                                        <strong>Time:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                    <p>
+
+                                        <strong>
+                                            Time:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $formattedTime,
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
-                                    <p>
-                                        <strong>Reason:</strong>
 
-                                        <?php echo htmlspecialchars(
+                                    <p>
+
+                                        <strong>
+                                            Reason:
+                                        </strong>
+
+                                        <?php
+                                        echo htmlspecialchars(
                                             $appointment["reason"],
                                             ENT_QUOTES,
                                             "UTF-8"
-                                        ); ?>
+                                        );
+                                        ?>
+
                                     </p>
 
                                 </div>
@@ -468,7 +729,8 @@ $appointmentHistory = $stmt->fetchAll();
                     <?php else: ?>
 
                         <p class="dashboard-empty">
-                            You do not have any appointment history yet.
+                            You do not have any appointment
+                            history yet.
                         </p>
 
                     <?php endif; ?>
@@ -476,35 +738,52 @@ $appointmentHistory = $stmt->fetchAll();
                 </div>
 
 
-                <!-- PATIENT PROFILE -->
+                <!-- ==================================
+                     PATIENT PROFILE
+                =================================== -->
 
                 <div class="dashboard-section">
 
-                    <h3>Patient Profile</h3>
+                    <h3>
+                        Patient Profile
+                    </h3>
 
                     <p>
-                        <strong>Name:</strong>
 
-                        <?php echo htmlspecialchars(
+                        <strong>
+                            Name:
+                        </strong>
+
+                        <?php
+                        echo htmlspecialchars(
                             $firstName,
                             ENT_QUOTES,
                             "UTF-8"
-                        ); ?>
+                        );
+                        ?>
+
                     </p>
 
                     <p>
-                        <strong>Email:</strong>
 
-                        <?php echo htmlspecialchars(
+                        <strong>
+                            Email:
+                        </strong>
+
+                        <?php
+                        echo htmlspecialchars(
                             $email,
                             ENT_QUOTES,
                             "UTF-8"
-                        ); ?>
+                        );
+                        ?>
+
                     </p>
 
                     <p>
-                        Manage your personal information, billing details,
-                        address, and medical records.
+                        Manage your personal information,
+                        billing details, address, and
+                        medical records.
                     </p>
 
                     <a
@@ -517,56 +796,91 @@ $appointmentHistory = $stmt->fetchAll();
                 </div>
 
 
-                <!-- MEMBERSHIP -->
+                <!-- ==================================
+                     MEMBERSHIP
+                =================================== -->
 
                 <div class="dashboard-section">
 
-                    <h3>Membership</h3>
+                    <h3>
+                        Membership
+                    </h3>
 
                     <?php if (
-                        !empty($membership["membership_plan"]) &&
-                        $membership["membership_status"] === "Active"
+                        !empty(
+                            $membership["membership_plan"]
+                        ) &&
+                        $membership["membership_status"]
+                            === "Active"
                     ): ?>
 
                         <p>
-                            <strong>Plan:</strong>
 
-                            <?php echo htmlspecialchars(
-                                $membership["membership_plan"],
+                            <strong>
+                                Plan:
+                            </strong>
+
+                            <?php
+                            echo htmlspecialchars(
+                                $membership[
+                                    "membership_plan"
+                                ],
                                 ENT_QUOTES,
                                 "UTF-8"
-                            ); ?>
+                            );
+                            ?>
+
                         </p>
 
 
                         <p>
-                            <strong>Status:</strong>
 
-                            <?php echo htmlspecialchars(
-                                $membership["membership_status"],
+                            <strong>
+                                Status:
+                            </strong>
+
+                            <?php
+                            echo htmlspecialchars(
+                                $membership[
+                                    "membership_status"
+                                ],
                                 ENT_QUOTES,
                                 "UTF-8"
-                            ); ?>
+                            );
+                            ?>
+
                         </p>
 
 
                         <?php if (
-                            !empty($membership["membership_started_at"])
+                            !empty(
+                                $membership[
+                                    "membership_started_at"
+                                ]
+                            )
                         ): ?>
 
                             <p>
-                                <strong>Member Since:</strong>
 
-                                <?php echo htmlspecialchars(
+                                <strong>
+                                    Member Since:
+                                </strong>
+
+                                <?php
+                                echo htmlspecialchars(
                                     date(
                                         "F j, Y",
                                         strtotime(
-                                            $membership["membership_started_at"]
+                                            $membership[
+                                                "membership_started_at"
+                                            ]
                                         )
                                     ),
                                     ENT_QUOTES,
                                     "UTF-8"
-                                ); ?>
+                                );
+                                ?>
+
                             </p>
 
                         <?php endif; ?>
@@ -582,7 +896,8 @@ $appointmentHistory = $stmt->fetchAll();
                     <?php else: ?>
 
                         <p class="dashboard-empty">
-                            You do not currently have an active membership.
+                            You do not currently have an
+                            active membership.
                         </p>
 
                         <a
@@ -603,6 +918,10 @@ $appointmentHistory = $stmt->fetchAll();
     </main>
 
 
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
     <footer>
 
         <div class="footer-main">
@@ -611,23 +930,43 @@ $appointmentHistory = $stmt->fetchAll();
 
                 <div class="footer-brand">
 
-                    <h2>HealthBridge Medical</h2>
+                    <h2>
+                        HealthBridge Medical
+                    </h2>
 
                     <p>
-                        Connecting patients with convenient and accessible
-                        healthcare services.
+                        Connecting patients with convenient
+                        and accessible healthcare services.
                     </p>
 
                 </div>
 
+
                 <div class="footer-links">
 
-                    <a href="../html/about.php">About</a>
-                    <a href="../html/contact.php">Contact</a>
-                    <a href="../html/membership.php">Memberships</a>
-                    <a href="../html/privacy.php">Privacy Policy</a>
-                    <a href="../html/terms.php">Terms and Conditions</a>
-                    <a href="../html/accessibility.php">Accessibility</a>
+                    <a href="../html/about.php">
+                        About
+                    </a>
+
+                    <a href="../html/contact.php">
+                        Contact
+                    </a>
+
+                    <a href="../html/membership.php">
+                        Memberships
+                    </a>
+
+                    <a href="../html/privacy.php">
+                        Privacy Policy
+                    </a>
+
+                    <a href="../html/terms.php">
+                        Terms and Conditions
+                    </a>
+
+                    <a href="../html/accessibility.php">
+                        Accessibility
+                    </a>
 
                 </div>
 
@@ -635,17 +974,19 @@ $appointmentHistory = $stmt->fetchAll();
 
         </div>
 
+
         <div class="footer-bottom">
 
             <p>
-                © 2026 HealthBridge Medical. This website is a mock
-                educational project and does not provide real medical
-                services.
+                © 2026 HealthBridge Medical.
+                This website is a mock educational project
+                and does not provide real medical services.
             </p>
 
         </div>
 
     </footer>
+
 
     <?php require_once "chatbot-widget.php"; ?>
 
