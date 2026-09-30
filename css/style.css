@@ -3505,9 +3505,4 @@ img {
 }
 
 
-/* Navigation hover underline */
-.main-nav a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 3px;
-    text-underline-offset: 8px;
-}
+
