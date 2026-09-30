@@ -20,7 +20,7 @@ session_start();
 
     <link
         rel="stylesheet"
-        href="../css/style.css?v=3"
+        href="../css/style.css?v=4"
     >
 
     <link
