@@ -164,18 +164,35 @@ session_start();
 
         <section class="services-appointment">
 
-            <h2>Need to Schedule a Visit?</h2>
+    <h2>Meet Our Doctors</h2>
 
-            <p>
-                Request an appointment with HealthBridge Medical and
-                choose a time that works for you.
-            </p>
+    <p>
+        Learn more about the healthcare professionals at
+        HealthBridge Medical, including their specialties,
+        education, and medical training.
+    </p>
 
-            <a href="appointment.php" class="primary-button">
-                Request Appointment
-            </a>
+    <a href="doctors.php" class="primary-button">
+        View Our Doctors
+    </a>
 
-        </section>
+</section>
+
+
+<section class="services-appointment">
+
+    <h2>Need to Schedule a Visit?</h2>
+
+    <p>
+        Request an appointment with HealthBridge Medical and
+        choose a time that works for you.
+    </p>
+
+    <a href="appointment.php" class="primary-button">
+        Request Appointment
+    </a>
+
+</section>
 
     </main>
 
