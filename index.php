@@ -11,7 +11,7 @@ session_start();
 
     <title>HealthBridge Medical</title>
 
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=5">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 
