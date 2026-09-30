@@ -3390,3 +3390,116 @@ img {
     }
 
 }
+
+
+/* ========================================
+   DOCTORS PAGE
+======================================== */
+
+.doctors-section {
+    padding-bottom: 70px;
+}
+
+.doctors-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.doctor-card {
+    background-color: #ffffff;
+
+    padding: 32px;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 14px rgba(16, 42, 67, 0.08);
+}
+
+.doctor-card h2 {
+    color: #102a43;
+
+    font-size: 24px;
+
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.doctor-card h3 {
+    color: #0f4c5c;
+
+    font-size: 17px;
+
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.doctor-card p {
+    color: #486581;
+
+    line-height: 1.7;
+
+    margin: 12px 0;
+}
+
+.doctor-card strong {
+    color: #334e68;
+}
+
+.doctors-disclaimer {
+    margin-top: 40px;
+
+    padding: 24px;
+
+    background-color: #e9f5f9;
+
+    border: 1px solid #d9e2ec;
+    border-radius: 12px;
+}
+
+.doctors-disclaimer p {
+    color: #486581;
+
+    line-height: 1.7;
+
+    margin: 0;
+}
+
+.doctors-disclaimer strong {
+    color: #102a43;
+}
+
+
+/* TABLET */
+
+@media (max-width: 900px) {
+
+    .doctors-container {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .doctors-section {
+        padding-bottom: 40px;
+    }
+
+    .doctor-card {
+        padding: 24px;
+    }
+
+    .doctor-card h2 {
+        font-size: 22px;
+    }
+
+    .doctors-disclaimer {
+        padding: 20px;
+    }
+
+}
