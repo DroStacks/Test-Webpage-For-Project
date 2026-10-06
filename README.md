@@ -27,6 +27,7 @@ The local environment is designed to mimic many aspects of a cloud-hosted Linux 
 * **Ubuntu Server** — Linux operating system hosting the web environment
 * **Git & GitHub** — Version control, source-code management, and project tracking
 * **SSH** — Remote administration and management of the Linux server
+* **CloudFlare** — DNS domian registar and provider
 
 ## Current Features
 
